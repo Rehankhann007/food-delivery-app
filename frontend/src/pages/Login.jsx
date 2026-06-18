@@ -8,23 +8,39 @@ export default function Login() {
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    const res = await fetch("http://localhost:5000/api/auth/login", {
+  const res = await fetch(
+    "https://food-delivery-app-e4by.onrender.com/api/auth/login",
+    {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
+    }
+  );
+
+  const data = await res.json();
+
+  // 🔥 CASE 1: OTP verification required
+  if (data.message === "Please verify your email first") {
+    alert("Please verify your email OTP first");
+
+    // OTP page pe bhejo
+    navigate("/verify-otp", {
+      state: { email }
     });
 
-    const data = await res.json();
+    return;
+  }
 
-    if (data.token) {
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      navigate("/");
-    } else {
-      alert(data.message);
-    }
-  };
+  // 🔥 CASE 2: success login
+  if (data.token) {
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
 
+    navigate("/");
+  } else {
+    alert(data.message);
+  }
+};
   return (
     <div style={styles.bg}>
       <div style={styles.card}>
