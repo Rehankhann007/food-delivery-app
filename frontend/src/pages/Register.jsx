@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // ================= REGISTER =================
   const handleRegister = async () => {
     if (!name || !email || !password) {
       alert("Please fill all fields");
@@ -18,18 +20,21 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const res = await fetch("https://food-delivery-app-e4by.onrender.com/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
+      const res = await fetch(
+        "https://food-delivery-app-e4by.onrender.com/api/auth/register",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, password }),
+        }
+      );
 
       const data = await res.json();
 
       if (res.ok) {
         alert("OTP sent to your email 📩");
 
-        // 👉 OTP page redirect with email
+        // OTP page redirect
         navigate("/verify-otp", {
           state: { email },
         });
@@ -44,12 +49,44 @@ export default function Register() {
     setLoading(false);
   };
 
+  // ================= GOOGLE LOGIN =================
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const res = await fetch(
+        "https://food-delivery-app-e4by.onrender.com/api/auth/google",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            token: credentialResponse.credential,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        alert("Google Login Success 🎉");
+        navigate("/");
+      } else {
+        alert("Google Login Failed");
+      }
+    } catch (err) {
+      console.log(err);
+      alert("Server Error");
+    }
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.card}>
         <h2 style={styles.title}>🍕 Create Account</h2>
         <p style={styles.subtitle}>Join & order delicious food</p>
 
+        {/* NAME */}
         <input
           style={styles.input}
           placeholder="Full Name"
@@ -57,6 +94,7 @@ export default function Register() {
           onChange={(e) => setName(e.target.value)}
         />
 
+        {/* EMAIL */}
         <input
           style={styles.input}
           placeholder="Email Address"
@@ -64,6 +102,7 @@ export default function Register() {
           onChange={(e) => setEmail(e.target.value)}
         />
 
+        {/* PASSWORD */}
         <input
           type="password"
           style={styles.input}
@@ -72,6 +111,7 @@ export default function Register() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
+        {/* SIGNUP BUTTON */}
         <button
           onClick={handleRegister}
           style={styles.button}
@@ -80,6 +120,15 @@ export default function Register() {
           {loading ? "Creating Account..." : "Sign Up"}
         </button>
 
+        {/* GOOGLE LOGIN */}
+        <div style={{ marginTop: "15px" }}>
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => alert("Google Login Failed")}
+          />
+        </div>
+
+        {/* LOGIN LINK */}
         <p style={styles.text}>
           Already have an account?{" "}
           <span
@@ -94,6 +143,7 @@ export default function Register() {
   );
 }
 
+// ================= STYLES =================
 const styles = {
   container: {
     height: "100vh",
@@ -111,7 +161,6 @@ const styles = {
     boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
     color: "#fff",
     textAlign: "center",
-    animation: "float 3s ease-in-out infinite",
   },
   title: {
     marginBottom: "5px",
@@ -142,7 +191,6 @@ const styles = {
     color: "#fff",
     fontWeight: "bold",
     cursor: "pointer",
-    transition: "0.3s",
   },
   text: {
     marginTop: "15px",
