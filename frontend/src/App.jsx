@@ -27,7 +27,7 @@ function App() {
   }, [cart]);
 
   return (
-    <GoogleOAuthProvider clientId="733280650717-fd5sonc4h1vg71cln2um6p0tvbo49ael.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId="514243762273-54r7kcibl5mjlg3imrnpqd0b0ch9tr1p.apps.googleusercontent.com">
       <BrowserRouter>
         {/* Navbar always visible */}
         <Navbar />

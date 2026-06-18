@@ -6,23 +6,60 @@ export default function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    const res = await fetch("https://food-delivery-app-e4by.onrender.com/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    if (!email || !password) {
+      alert("Please fill all fields");
+      return;
+    }
 
-    const data = await res.json();
+    setLoading(true);
 
-    if (data.token) {
+    try {
+      const res = await fetch(
+        "https://food-delivery-app-e4by.onrender.com/api/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        }
+      );
+
+      const data = await res.json();
+
+      console.log("LOGIN RESPONSE:", data);
+
+      // ❌ OTP NOT VERIFIED CASE
+      if (data.message === "Please verify your email first") {
+        alert("⚠️ Please verify your email first");
+
+        navigate("/verify-otp", {
+          state: { email },
+        });
+
+        return;
+      }
+
+      // ❌ INVALID LOGIN
+      if (!data.token) {
+        alert(data.message || "Login failed");
+        return;
+      }
+
+      // ✅ SUCCESS LOGIN
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+
+      alert("Login Successful 🎉");
       navigate("/");
-    } else {
-      alert(data.message);
+
+    } catch (err) {
+      console.log(err);
+      alert("Server Error");
     }
+
+    setLoading(false);
   };
 
   return (
@@ -46,13 +83,20 @@ export default function Login() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button onClick={handleLogin} style={styles.button}>
-          Login
+        <button
+          onClick={handleLogin}
+          style={styles.button}
+          disabled={loading}
+        >
+          {loading ? "Logging in..." : "Login"}
         </button>
 
         <p style={styles.text}>
           New here?{" "}
-          <span onClick={() => navigate("/signup")} style={styles.link}>
+          <span
+            onClick={() => navigate("/signup")}
+            style={styles.link}
+          >
             Create account
           </span>
         </p>
@@ -61,6 +105,7 @@ export default function Login() {
   );
 }
 
+// ================= STYLES =================
 const styles = {
   bg: {
     height: "100vh",
@@ -68,7 +113,6 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     background: "#0f172a",
-    animation: "fadeIn 1s ease-in-out",
   },
   card: {
     width: "360px",
@@ -79,8 +123,6 @@ const styles = {
     boxShadow: "0 0 30px rgba(0,0,0,0.4)",
     color: "#fff",
     textAlign: "center",
-    transform: "translateY(0)",
-    animation: "float 3s ease-in-out infinite",
   },
   title: {
     marginBottom: "5px",
@@ -110,7 +152,6 @@ const styles = {
     color: "#fff",
     fontWeight: "bold",
     cursor: "pointer",
-    transition: "0.3s",
   },
   text: {
     marginTop: "15px",
