@@ -1,204 +1,147 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { GoogleLogin } from "@react-oauth/google";
 
-export default function Register() {
+function Register() {
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [otp, setOtp] = useState("");
 
-  // ================= REGISTER =================
-  const handleRegister = async () => {
-    if (!name || !email || !password) {
-      alert("Please fill all fields");
-      return;
-    }
+  const [otpSent, setOtpSent] = useState(false);
 
-    setLoading(true);
-
+  // SEND OTP
+  const sendOtp = async () => {
     try {
       const res = await fetch(
-        "https://food-delivery-app-e4by.onrender.com/api/auth/register",
+        "https://food-delivery-app-e4by.onrender.com/api/auth/send-otp",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, password }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
         }
       );
 
       const data = await res.json();
 
-      if (res.ok) {
-        alert("OTP sent to your email 📩");
-
-        // OTP page redirect
-        navigate("/verify-otp", {
-          state: { email },
-        });
+      if (data.success) {
+        alert("OTP Sent Successfully");
+        setOtpSent(true);
       } else {
-        alert(data.message || "Registration failed");
+        alert(data.message);
       }
-    } catch (err) {
-      console.log(err);
-      alert("Server error");
+    } catch (error) {
+      console.log(error);
+      alert("Server Error");
     }
-
-    setLoading(false);
   };
 
-  // ================= GOOGLE LOGIN =================
-  const handleGoogleSuccess = async (credentialResponse) => {
+  // VERIFY OTP + CREATE ACCOUNT
+  const verifyOtp = async () => {
     try {
       const res = await fetch(
-        "https://food-delivery-app-e4by.onrender.com/api/auth/google",
+        "https://food-delivery-app-e4by.onrender.com/api/auth/verify-otp",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
-            token: credentialResponse.credential,
+            name,
+            email,
+            password,
+            otp,
           }),
         }
       );
 
       const data = await res.json();
 
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
+      if (data.success) {
+        alert("Account Created Successfully");
 
-        alert("Google Login Success 🎉");
-        navigate("/");
+        navigate("/login");
       } else {
-        alert("Google Login Failed");
+        alert(data.message);
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
       alert("Server Error");
     }
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h2 style={styles.title}>🍕 Create Account</h2>
-        <p style={styles.subtitle}>Join & order delicious food</p>
+  <div className="min-h-screen flex justify-center items-center bg-gray-100">
+    <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+      <h2 className="text-3xl font-bold text-center text-orange-500 mb-6">
+        Create Account
+      </h2>
 
-        {/* NAME */}
-        <input
-          style={styles.input}
-          placeholder="Full Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+      <input
+        type="text"
+        placeholder="Full Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        className="w-full border p-3 rounded-lg mb-4"
+      />
 
-        {/* EMAIL */}
-        <input
-          style={styles.input}
-          placeholder="Email Address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+      <input
+        type="email"
+        placeholder="Email Address"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="w-full border p-3 rounded-lg mb-4"
+      />
 
-        {/* PASSWORD */}
-        <input
-          type="password"
-          style={styles.input}
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="w-full border p-3 rounded-lg mb-4"
+      />
 
-        {/* SIGNUP BUTTON */}
+      {!otpSent ? (
         <button
-          onClick={handleRegister}
-          style={styles.button}
-          disabled={loading}
+          onClick={sendOtp}
+          className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600"
         >
-          {loading ? "Creating Account..." : "Sign Up"}
+          Send OTP
         </button>
-
-        {/* GOOGLE LOGIN */}
-        <div style={{ marginTop: "15px" }}>
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={() => alert("Google Login Failed")}
+      ) : (
+        <>
+          <input
+            type="text"
+            placeholder="Enter OTP"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+            className="w-full border p-3 rounded-lg mb-4"
           />
-        </div>
 
-        {/* LOGIN LINK */}
-        <p style={styles.text}>
-          Already have an account?{" "}
-          <span
-            style={styles.link}
-            onClick={() => navigate("/login")}
+          <button
+            onClick={verifyOtp}
+            className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold hover:bg-green-600"
           >
-            Login
-          </span>
-        </p>
-      </div>
+            Verify OTP & Create Account
+          </button>
+        </>
+      )}
+
+      <p className="text-center mt-5 text-gray-600">
+        Already have an account?{" "}
+        <span
+          className="text-orange-500 cursor-pointer font-semibold"
+          onClick={() => navigate("/login")}
+        >
+          Login
+        </span>
+      </p>
     </div>
-  );
+  </div>
+);
 }
 
-// ================= STYLES =================
-const styles = {
-  container: {
-    height: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "linear-gradient(135deg,#0f172a,#1e293b)",
-  },
-  card: {
-    width: "380px",
-    padding: "30px",
-    borderRadius: "16px",
-    background: "rgba(255,255,255,0.08)",
-    backdropFilter: "blur(15px)",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
-    color: "#fff",
-    textAlign: "center",
-  },
-  title: {
-    marginBottom: "5px",
-    fontSize: "24px",
-  },
-  subtitle: {
-    fontSize: "13px",
-    opacity: 0.7,
-    marginBottom: "20px",
-  },
-  input: {
-    width: "100%",
-    padding: "12px",
-    margin: "10px 0",
-    borderRadius: "10px",
-    border: "1px solid rgba(255,255,255,0.2)",
-    outline: "none",
-    background: "rgba(255,255,255,0.05)",
-    color: "#fff",
-  },
-  button: {
-    width: "100%",
-    padding: "12px",
-    marginTop: "10px",
-    background: "#ff4d2d",
-    border: "none",
-    borderRadius: "10px",
-    color: "#fff",
-    fontWeight: "bold",
-    cursor: "pointer",
-  },
-  text: {
-    marginTop: "15px",
-    fontSize: "14px",
-  },
-  link: {
-    color: "#ff4d2d",
-    cursor: "pointer",
-    fontWeight: "bold",
-  },
-};
+export default Register;

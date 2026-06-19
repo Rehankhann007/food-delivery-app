@@ -5,80 +5,115 @@ const User = require("../models/User");
 const auth = require("../middleware/auth");
 const sendEmail = require("../utils/sendEmail");
 const { OAuth2Client } = require("google-auth-library");
+const nodemailer = require("nodemailer");
+const otpGenerator = require("otp-generator");
+const Otp = require("../models/Otp");
 
 const router = express.Router();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 //
-// ================= REGISTER (OTP SEND) =================
-//
-router.post("/register", async (req, res) => {
+// ================= SEND OTP =================
+router.post("/send-otp", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { email } = req.body;
 
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(400).json({ message: "User already exists" });
+    const otp = otpGenerator.generate(6, {
+      upperCaseAlphabets: false,
+      lowerCaseAlphabets: false,
+      specialChars: false,
+    });
+
+    await Otp.create({
+      email,
+      otp,
+    });
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Email Verification OTP",
+      text: `Your OTP is ${otp}`,
+    });
+
+    res.json({
+      success: true,
+      message: "OTP Sent Successfully",
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+// ================= VERIFY OTP =================
+router.post("/verify-otp", async (req, res) => {
+  try {
+    const { name, email, password, otp } = req.body;
+
+    const otpRecord = await Otp.findOne({
+      email,
+      otp,
+    });
+
+    if (!otpRecord) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid OTP",
+      });
     }
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const userExists = await User.findOne({
+      email,
+    });
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    if (userExists) {
+      return res.status(400).json({
+        success: false,
+        message: "User already exists",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(
+      password,
+      10
+    );
 
     const user = new User({
       name,
       email,
       password: hashedPassword,
-      otp,
-      otpExpire: Date.now() + 10 * 60 * 1000,
-      isVerified: false,
+      role: "user",
+      isVerified: true,
     });
 
     await user.save();
-    await sendEmail(email, otp);
+
+    await Otp.deleteMany({ email });
 
     res.json({
-      message: "OTP sent to email",
+      success: true,
+      message: "Account Created Successfully",
     });
-
   } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+    console.log(error);
 
-//
-// ================= VERIFY OTP =================
-//
-router.post("/verify-otp", async (req, res) => {
-  try {
-    const { email, otp } = req.body;
-
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(400).json({ message: "User not found" });
-    }
-
-    if (user.otp !== otp) {
-      return res.status(400).json({ message: "Invalid OTP" });
-    }
-
-    if (user.otpExpire < Date.now()) {
-      return res.status(400).json({ message: "OTP expired" });
-    }
-
-    user.isVerified = true;
-    user.otp = null;
-    user.otpExpire = null;
-
-    await user.save();
-
-    res.json({
-      message: "Email verified successfully",
+    res.status(500).json({
+      success: false,
+      message: error.message,
     });
-
-  } catch (error) {
-    res.status(500).json({ message: error.message });
   }
 });
 
