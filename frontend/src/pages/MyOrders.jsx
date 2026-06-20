@@ -14,7 +14,7 @@ export default function MyOrders() {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-  "https://food-delivery-app-e4by.onrender.com/api/orders/my-orders",
+  "http://localhost:5000/api/orders/my-orders",
   {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -37,7 +37,7 @@ setOrders(res.data);
       const token = localStorage.getItem("token");
 
       const res = await axios.put(
-        `https://food-delivery-app-e4by.onrender.com/api/orders/cancel/${id}`,
+        `http://localhost:5000/api/orders/cancel/${id}`,
         {},
         {
           headers: {
