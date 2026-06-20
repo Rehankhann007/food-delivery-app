@@ -199,7 +199,7 @@ const resendOtp = async () => {
     onSuccess={async (credentialResponse) => {
       try {
         const res = await fetch(
-          "http://localhost:5000/api/auth/google",
+          "https://food-delivery-app-e4by.onrender.com/api/auth/google",
           {
             method: "POST",
             headers: {
@@ -232,9 +232,13 @@ const resendOtp = async () => {
           window.location.reload();
         }
       } catch (err) {
-        console.log(err);
-        alert("Google Signup Failed");
-      }
+  console.log("GOOGLE ERROR:", err);
+
+  alert(
+    err?.message ||
+    JSON.stringify(err)
+  );
+}
     }}
     onError={() => {
       alert("Google Signup Failed");
