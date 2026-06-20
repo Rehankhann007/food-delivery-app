@@ -14,6 +14,9 @@ function Register() {
 
   // SEND OTP
   const sendOtp = async () => {
+
+    alert("Send OTP Clicked");
+
     try {
       const res = await fetch(
         "https://food-delivery-app-e4by.onrender.com/api/auth/send-otp",
