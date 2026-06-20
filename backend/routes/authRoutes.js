@@ -5,13 +5,17 @@ const User = require("../models/User");
 const auth = require("../middleware/auth");
 const sendEmail = require("../utils/sendEmail");
 const { OAuth2Client } = require("google-auth-library");
-const nodemailer = require("nodemailer");
 const otpGenerator = require("otp-generator");
 const Otp = require("../models/Otp");
 
 const router = express.Router();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+const { Resend } = require("resend");
+
+const resend = new Resend(
+  process.env.RESEND_API_KEY
+);
 //
 // ================= SEND OTP =================
 router.post("/send-otp", async (req, res) => {
@@ -32,23 +36,12 @@ router.post("/send-otp", async (req, res) => {
       otp,
     });
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-console.log("EMAIL_USER:", process.env.EMAIL_USER);
-console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "FOUND" : "MISSING");
-
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "Email Verification OTP",
-      text: `Your OTP is ${otp}`,
-    });
+  await resend.emails.send({
+  from: "onboarding@resend.dev",
+  to: email,
+  subject: "Email Verification OTP",
+  html: `<h2>Your OTP is ${otp}</h2>`,
+});
 
     res.json({
       success: true,
@@ -143,20 +136,14 @@ router.post("/resend-otp", async (req, res) => {
       otp,
     });
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
+    
 
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "BiteMeNow OTP",
-      text: `Your new OTP is ${otp}`,
-    });
+    await resend.emails.send({
+  from: "onboarding@resend.dev",
+  to: email,
+  subject: "BiteMeNow OTP",
+  html: `<h2>Your New OTP is ${otp}</h2>`,
+});
 
     res.json({
       success: true,
@@ -200,20 +187,14 @@ router.post("/forgot-password", async (req, res) => {
       otp,
     });
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
+    
 
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "Password Reset OTP",
-      text: `Your password reset OTP is ${otp}`,
-    });
+    await resend.emails.send({
+  from: "onboarding@resend.dev",
+  to: email,
+  subject: "Password Reset OTP",
+  html: `<h2>Your Password Reset OTP is ${otp}</h2>`,
+});
 
     res.json({
       success: true,
