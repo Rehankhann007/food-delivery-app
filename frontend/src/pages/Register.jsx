@@ -16,7 +16,7 @@ function Register() {
   const sendOtp = async () => {
     try {
       const res = await fetch(
-        "http://localhost:5000/api/auth/send-otp",
+        "https://food-delivery-app-e4by.onrender.com/api/auth/send-otp",
         {
           method: "POST",
           headers: {
@@ -48,7 +48,7 @@ function Register() {
 const resendOtp = async () => {
   try {
     const res = await fetch(
-      "http://localhost:5000/api/auth/resend-otp",
+      "https://food-delivery-app-e4by.onrender.com/api/auth/resend-otp",
       {
         method: "POST",
         headers: {
@@ -79,7 +79,7 @@ const resendOtp = async () => {
   const verifyOtp = async () => {
     try {
       const res = await fetch(
-        "http://localhost:5000/api/auth/verify-otp",
+        "https://food-delivery-app-e4by.onrender.com/api/auth/verify-otp",
         {
           method: "POST",
           headers: {
@@ -208,7 +208,7 @@ const resendOtp = async () => {
     onSuccess={async (credentialResponse) => {
       try {
         const res = await fetch(
-          "http://localhost:5000/api/auth/google",
+          "https://food-delivery-app-e4by.onrender.com/api/auth/google",
           {
             method: "POST",
             headers: {
