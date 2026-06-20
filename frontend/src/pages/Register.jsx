@@ -34,10 +34,14 @@ function Register() {
       } else {
         alert(data.message);
       }
-    } catch (error) {
-      console.log(error);
-      alert("Server Error");
-    }
+    } catch (err) {
+  console.log(err);
+
+  alert(
+    err?.message ||
+    JSON.stringify(err)
+  );
+}
   };
 
 // resend OTP
@@ -61,9 +65,14 @@ const resendOtp = async () => {
     } else {
       alert(data.message);
     }
-  } catch (error) {
-    console.log(error);
-  }
+  } catch (err) {
+  console.log(err);
+
+  alert(
+    err?.message ||
+    JSON.stringify(err)
+  );
+}
 };
 
   // VERIFY OTP + CREATE ACCOUNT
