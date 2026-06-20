@@ -10,9 +10,6 @@ export default function ForgotPassword() {
   const [otpSent, setOtpSent] = useState(false);
 
   const sendOtp = async () => {
-  try {
-    alert("Send OTP Clicked");
-
     const res = await fetch(
       "https://food-delivery-app-e4by.onrender.com/api/auth/forgot-password",
       {
@@ -26,23 +23,13 @@ export default function ForgotPassword() {
 
     const data = await res.json();
 
-    console.log(data);
-
     if (data.success) {
       setOtpSent(true);
       alert("OTP Sent");
     } else {
       alert(data.message);
     }
-  } catch (error) {
-    console.log("FORGOT PASSWORD ERROR:", error);
-
-    alert(
-      error?.message ||
-      JSON.stringify(error)
-    );
-  }
-};
+  };
 
   const resetPassword = async () => {
     const res = await fetch(
