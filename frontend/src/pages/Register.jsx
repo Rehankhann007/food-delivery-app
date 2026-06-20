@@ -14,42 +14,37 @@ function Register() {
 
   // SEND OTP
   const sendOtp = async () => {
-  alert("Send OTP Clicked");
+    try {
+      const res = await fetch(
+        "http://localhost:5000/api/auth/send-otp",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        }
+      );
 
-  try {
-    console.log("EMAIL:", email);
+      const data = await res.json();
 
-    const res = await fetch(
-      "https://food-delivery-app-e4by.onrender.com/api/auth/send-otp",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
+      if (data.success) {
+        alert("OTP Sent Successfully");
+        setOtpSent(true);
+      } else {
+        alert(data.message);
       }
-    );
-
-    console.log("STATUS:", res.status);
-
-    const data = await res.json();
-
-    console.log("DATA:", data);
-
-    alert(JSON.stringify(data));
-
-  } catch (error) {
-    console.log("OTP ERROR:", error);
-
-    alert(error?.message);
-  }
-};
+    } catch (error) {
+      console.log(error);
+      alert("Server Error");
+    }
+  };
 
 // resend OTP
 const resendOtp = async () => {
   try {
     const res = await fetch(
-      "https://food-delivery-app-e4by.onrender.com/api/auth/resend-otp",
+      "http://localhost:5000/api/auth/resend-otp",
       {
         method: "POST",
         headers: {
@@ -75,7 +70,7 @@ const resendOtp = async () => {
   const verifyOtp = async () => {
     try {
       const res = await fetch(
-        "https://food-delivery-app-e4by.onrender.com/api/auth/verify-otp",
+        "http://localhost:5000/api/auth/verify-otp",
         {
           method: "POST",
           headers: {
@@ -100,13 +95,9 @@ const resendOtp = async () => {
         alert(data.message);
       }
     } catch (error) {
-  console.log("LOGIN ERROR:", error);
-
-  alert(
-    error?.message ||
-    JSON.stringify(error)
-  );
-}
+      console.log(error);
+      alert("Server Error");
+    }
   };
 
 
@@ -208,7 +199,7 @@ const resendOtp = async () => {
     onSuccess={async (credentialResponse) => {
       try {
         const res = await fetch(
-          "https://food-delivery-app-e4by.onrender.com/api/auth/google",
+          "http://localhost:5000/api/auth/google",
           {
             method: "POST",
             headers: {
@@ -241,13 +232,9 @@ const resendOtp = async () => {
           window.location.reload();
         }
       } catch (err) {
-  console.log("GOOGLE ERROR:", err);
-
-  alert(
-    err?.message ||
-    JSON.stringify(err)
-  );
-}
+        console.log(err);
+        alert("Google Signup Failed");
+      }
     }}
     onError={() => {
       alert("Google Signup Failed");
