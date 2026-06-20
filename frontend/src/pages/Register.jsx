@@ -28,6 +28,10 @@ function Register() {
 
       const data = await res.json();
 
+console.log(data);
+
+alert(JSON.stringify(data));
+
       if (data.success) {
         alert("OTP Sent Successfully");
         setOtpSent(true);
@@ -35,9 +39,13 @@ function Register() {
         alert(data.message);
       }
     } catch (error) {
-      console.log(error);
-      alert("Server Error");
-    }
+  console.log("OTP ERROR:", error);
+
+  alert(
+    error?.message ||
+    JSON.stringify(error)
+  );
+}
   };
 
 // resend OTP
