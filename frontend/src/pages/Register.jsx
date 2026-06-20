@@ -15,6 +15,9 @@ function Register() {
   // SEND OTP
   const sendOtp = async () => {
     try {
+
+      console.log("Before Fetch");
+
       const res = await fetch(
         "http://localhost:5000/api/auth/send-otp",
         {
