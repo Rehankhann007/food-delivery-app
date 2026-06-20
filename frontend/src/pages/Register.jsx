@@ -14,42 +14,36 @@ function Register() {
 
   // SEND OTP
   const sendOtp = async () => {
+  alert("Send OTP Clicked");
 
-    alert("Send OTP Clicked");
+  try {
+    console.log("EMAIL:", email);
 
-    try {
-      const res = await fetch(
-        "https://food-delivery-app-e4by.onrender.com/api/auth/send-otp",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        }
-      );
-
-      const data = await res.json();
-
-console.log(data);
-
-alert(JSON.stringify(data));
-
-      if (data.success) {
-        alert("OTP Sent Successfully");
-        setOtpSent(true);
-      } else {
-        alert(data.message);
+    const res = await fetch(
+      "https://food-delivery-app-e4by.onrender.com/api/auth/send-otp",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
       }
-    } catch (error) {
-  console.log("OTP ERROR:", error);
+    );
 
-  alert(
-    error?.message ||
-    JSON.stringify(error)
-  );
-}
-  };
+    console.log("STATUS:", res.status);
+
+    const data = await res.json();
+
+    console.log("DATA:", data);
+
+    alert(JSON.stringify(data));
+
+  } catch (error) {
+    console.log("OTP ERROR:", error);
+
+    alert(error?.message);
+  }
+};
 
 // resend OTP
 const resendOtp = async () => {
