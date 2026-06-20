@@ -21,7 +21,7 @@ export default function Admin() {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        "http://localhost:5000/api/orders",
+        "https://food-delivery-app-e4by.onrender.com/api/orders",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -40,7 +40,7 @@ export default function Admin() {
       const token = localStorage.getItem("token");
 
       await axios.put(
-        `http://localhost:5000/api/orders/${id}`,
+        `https://food-delivery-app-e4by.onrender.com/api/orders/${id}`,
         { status },
         {
           headers: {

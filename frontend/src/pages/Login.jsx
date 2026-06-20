@@ -11,7 +11,7 @@ export default function Login() {
   const handleLogin = async () => {
     try {
       const res = await fetch(
-        "http://localhost:5000/api/auth/login",
+        "https://food-delivery-app-e4by.onrender.com/api/auth/login",
         {
           method: "POST",
           headers: {
@@ -45,9 +45,13 @@ export default function Login() {
         alert(data.message);
       }
     } catch (error) {
-      console.log(error);
-      alert("Server Error");
-    }
+  console.log("LOGIN ERROR:", error);
+
+  alert(
+    error?.message ||
+    JSON.stringify(error)
+  );
+}
   };
 
  
@@ -116,7 +120,7 @@ export default function Login() {
     onSuccess={async (credentialResponse) => {
       try {
         const res = await fetch(
-          "http://localhost:5000/api/auth/google",
+          "https://food-delivery-app-e4by.onrender.com/api/auth/google",
           {
             method: "POST",
             headers: {
@@ -149,9 +153,13 @@ export default function Login() {
           window.location.reload();
         }
       } catch (err) {
-        console.log(err);
-        alert("Google Signup Failed");
-      }
+  console.log("GOOGLE ERROR:", err);
+
+  alert(
+    err?.message ||
+    JSON.stringify(err)
+  );
+}
     }}
     onError={() => {
       alert("Google Signup Failed");

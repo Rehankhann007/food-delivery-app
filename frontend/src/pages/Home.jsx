@@ -10,7 +10,7 @@ function Home({ cart, setCart }) {
 
   const getFoods = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/foods");
+      const res = await axios.get("https://food-delivery-app-e4by.onrender.com/api/foods");
       setFoods(res.data);
     } catch (error) {
       console.log(error);

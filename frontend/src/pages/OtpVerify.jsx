@@ -17,7 +17,7 @@ export default function OtpVerify() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/verify-otp", {
+      const res = await fetch("https://food-delivery-app-e4by.onrender.com/api/auth/verify-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

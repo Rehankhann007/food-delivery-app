@@ -11,7 +11,7 @@ export default function ForgotPassword() {
 
   const sendOtp = async () => {
     const res = await fetch(
-      "http://localhost:5000/api/auth/forgot-password",
+      "https://food-delivery-app-e4by.onrender.com/api/auth/forgot-password",
       {
         method: "POST",
         headers: {
@@ -33,7 +33,7 @@ export default function ForgotPassword() {
 
   const resetPassword = async () => {
     const res = await fetch(
-      "http://localhost:5000/api/auth/reset-password",
+      "https://food-delivery-app-e4by.onrender.com/api/auth/reset-password",
       {
         method: "POST",
         headers: {

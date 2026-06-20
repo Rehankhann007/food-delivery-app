@@ -43,7 +43,7 @@ export default function Checkout() {
     if (!address) return alert("Enter address");
     if (!token) return alert("Login required");
 
-    const res = await fetch("http://localhost:5000/api/orders/place", {
+    const res = await fetch("https://food-delivery-app-e4by.onrender.com/api/orders/place", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
