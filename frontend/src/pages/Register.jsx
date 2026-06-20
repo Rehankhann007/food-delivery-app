@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
 
 function Register() {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ function Register() {
   const sendOtp = async () => {
     try {
       const res = await fetch(
-        "https://food-delivery-app-e4by.onrender.com/api/auth/send-otp",
+        "http://localhost:5000/api/auth/send-otp",
         {
           method: "POST",
           headers: {
@@ -39,11 +40,37 @@ function Register() {
     }
   };
 
+// resend OTP
+const resendOtp = async () => {
+  try {
+    const res = await fetch(
+      "http://localhost:5000/api/auth/resend-otp",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.success) {
+      alert("New OTP Sent");
+    } else {
+      alert(data.message);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
   // VERIFY OTP + CREATE ACCOUNT
   const verifyOtp = async () => {
     try {
       const res = await fetch(
-        "https://food-delivery-app-e4by.onrender.com/api/auth/verify-otp",
+        "http://localhost:5000/api/auth/verify-otp",
         {
           method: "POST",
           headers: {
@@ -72,6 +99,7 @@ function Register() {
       alert("Server Error");
     }
   };
+
 
   return (
   <div className="min-h-screen flex justify-center items-center bg-gray-100">
@@ -121,12 +149,27 @@ function Register() {
             className="w-full border p-3 rounded-lg mb-4"
           />
 
-          <button
-            onClick={verifyOtp}
-            className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold hover:bg-green-600"
-          >
-            Verify OTP & Create Account
-          </button>
+        {otpSent && (
+  <>
+    
+
+    <button
+      onClick={verifyOtp}
+      className="w-full bg-green-500 text-white py-3 rounded-lg mb-3"
+    >
+      Verify OTP
+    </button>
+
+    <button
+      onClick={resendOtp}
+      className="w-full bg-blue-500 text-white py-3 rounded-lg"
+    >
+      Resend OTP
+    </button>
+  </>
+)}
+
+          
         </>
       )}
 
@@ -139,6 +182,66 @@ function Register() {
           Login
         </span>
       </p>
+
+<div className="my-5 flex items-center">
+  <div className="flex-1 border-t"></div>
+  <span className="px-3 text-gray-500">
+    OR
+  </span>
+  <div className="flex-1 border-t"></div>
+</div>
+
+<div className="flex justify-center">
+  <GoogleLogin
+    size="large"
+    shape="pill"
+    width="350"
+    onSuccess={async (credentialResponse) => {
+      try {
+        const res = await fetch(
+          "http://localhost:5000/api/auth/google",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              token: credentialResponse.credential,
+            }),
+          }
+        );
+
+        const data = await res.json();
+
+        if (data.token) {
+          localStorage.setItem(
+            "token",
+            data.token
+          );
+
+          localStorage.setItem(
+            "user",
+            JSON.stringify(data.user)
+          );
+
+          alert(
+            "Google Account Created Successfully"
+          );
+
+          navigate("/");
+          window.location.reload();
+        }
+      } catch (err) {
+        console.log(err);
+        alert("Google Signup Failed");
+      }
+    }}
+    onError={() => {
+      alert("Google Signup Failed");
+    }}
+  />
+</div>
+
     </div>
   </div>
 );

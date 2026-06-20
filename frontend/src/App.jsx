@@ -10,6 +10,7 @@ import Admin from "./pages/Admin";
 import MyOrders from "./pages/MyOrders";
 import Profile from "./pages/Profile";
 import OtpVerify from "./pages/OtpVerify";
+import ForgotPassword from "./pages/ForgotPassword";
 
 
 import Navbar from "./components/Navbar";
@@ -61,6 +62,12 @@ function App() {
 
 <Route path="/profile" element={<Profile />} />
 <Route path="/verify-otp" element={<OtpVerify />} />
+
+<Route
+  path="/forgot-password"
+  element={<ForgotPassword />}
+/>
+
       </Routes>
     </BrowserRouter>
     </GoogleOAuthProvider>

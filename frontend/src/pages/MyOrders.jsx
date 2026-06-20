@@ -14,15 +14,17 @@ export default function MyOrders() {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        "https://food-delivery-app-e4by.onrender.com/api/orders/my-orders",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  "https://food-delivery-app-e4by.onrender.com/api/orders/my-orders",
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
 
-      setOrders(res.data);
+console.log("MY ORDERS DATA:", res.data);
+
+setOrders(res.data);
     } catch (err) {
       console.log(err);
     } finally {
@@ -45,70 +47,228 @@ export default function MyOrders() {
       );
 
       if (res.data.success) {
-        alert("Order Cancelled");
+        alert("Order Cancelled Successfully");
         fetchOrders();
       }
     } catch (err) {
       console.log(err);
-      alert("Cancel failed");
+      alert("Cancel Failed");
     }
   };
 
-  return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>📦 My Orders</h1>
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case "Pending":
+        return {
+          background: "#FEF3C7",
+          color: "#D97706",
+        };
 
-      {loading ? (
-        <p style={{ textAlign: "center" }}>Loading orders...</p>
-      ) : orders.length === 0 ? (
-        <div style={styles.emptyBox}>
-          <h3>No Orders Yet 😢</h3>
-          <p>Order your favorite food now!</p>
+      case "Preparing":
+        return {
+          background: "#DBEAFE",
+          color: "#2563EB",
+        };
+
+      case "Out For Delivery":
+        return {
+          background: "#FED7AA",
+          color: "#EA580C",
+        };
+
+      case "Delivered":
+        return {
+          background: "#DCFCE7",
+          color: "#16A34A",
+        };
+
+      case "Cancelled":
+        return {
+          background: "#FEE2E2",
+          color: "#DC2626",
+        };
+
+      default:
+        return {
+          background: "#eee",
+          color: "#000",
+        };
+    }
+  };
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", padding: "50px" }}>
+        <h2>Loading Orders...</h2>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      style={{
+        padding: "20px",
+        minHeight: "100vh",
+        background: "#f5f5f5",
+      }}
+    >
+      <h1
+        style={{
+          textAlign: "center",
+          marginBottom: "25px",
+        }}
+      >
+        📦 My Orders
+      </h1>
+
+      {orders.length === 0 ? (
+        <div
+          style={{
+            background: "#fff",
+            padding: "40px",
+            borderRadius: "15px",
+            textAlign: "center",
+          }}
+        >
+          <h2>No Orders Yet 😢</h2>
+          <p>Order your favourite food now!</p>
         </div>
       ) : (
-        <div style={styles.grid}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fit,minmax(320px,1fr))",
+            gap: "20px",
+          }}
+        >
           {orders.map((order) => (
-            <div key={order._id} style={styles.card}>
-              
-              {/* Header */}
-              <div style={styles.cardHeader}>
+            <div
+              key={order._id}
+              style={{
+                background: "#fff",
+                borderRadius: "15px",
+                padding: "18px",
+                boxShadow:
+                  "0 4px 12px rgba(0,0,0,0.1)",
+              }}
+            >
+              {/* Order Header */}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: "12px",
+                }}
+              >
                 <span>Order ID</span>
-                <span style={styles.idText}>
+
+                <strong>
                   #{order._id.slice(-6)}
-                </span>
+                </strong>
               </div>
 
               {/* Status */}
-              <div style={styles.statusRow}>
-                <span style={styles.status}>
-                  {order.status || "Processing"}
+              <div style={{ marginBottom: "15px" }}>
+                <span
+                  style={{
+                    padding: "6px 12px",
+                    borderRadius: "30px",
+                    fontSize: "12px",
+                    fontWeight: "bold",
+                    ...getStatusStyle(order.status),
+                  }}
+                >
+                  {order.status}
                 </span>
               </div>
 
               {/* Items */}
-              <div style={styles.items}>
+              <div
+                style={{
+                  borderTop: "1px solid #eee",
+                  borderBottom: "1px solid #eee",
+                  padding: "12px 0",
+                }}
+              >
                 {order.items.map((item, index) => (
-                  <div key={index} style={styles.itemRow}>
-                    <span>{item.name}</span>
-                    <span>₹{item.price}</span>
+                  <div
+                    key={index}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      padding: "5px 0",
+                    }}
+                  >
+                    <span>
+                      {item.name}
+                      {item.qty
+                        ? ` x ${item.qty}`
+                        : ""}
+                    </span>
+
+                    <span>
+                      ₹
+                      {item.price *
+                        (item.qty || 1)}
+                    </span>
                   </div>
                 ))}
               </div>
 
               {/* Total */}
-              <div style={styles.total}>
-                <strong>Total:</strong>
-                <strong>₹{order.totalAmount}</strong>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginTop: "12px",
+                  fontSize: "16px",
+                }}
+              >
+                <strong>Total</strong>
+
+                <strong>
+                  ₹{order.totalAmount}
+                </strong>
               </div>
 
-              {/* ✅ CANCEL BUTTON (INSIDE CARD) */}
-              <button
-                onClick={() => cancelOrder(order._id)}
-                style={styles.cancelBtn}
+              {/* Date */}
+              <p
+                style={{
+                  marginTop: "10px",
+                  fontSize: "13px",
+                  color: "#666",
+                }}
               >
-                Cancel Order
-              </button>
+                {new Date(
+                  order.createdAt
+                ).toLocaleString()}
+              </p>
 
+              {/* Cancel Button */}
+              {order.status !== "Delivered" &&
+                order.status !==
+                  "Cancelled" && (
+                  <button
+                    onClick={() =>
+                      cancelOrder(order._id)
+                    }
+                    style={{
+                      marginTop: "15px",
+                      width: "100%",
+                      padding: "10px",
+                      border: "none",
+                      borderRadius: "8px",
+                      background:
+                        "#ef4444",
+                      color: "#fff",
+                      fontWeight: "bold",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Cancel Order
+                  </button>
+                )}
             </div>
           ))}
         </div>
@@ -116,82 +276,3 @@ export default function MyOrders() {
     </div>
   );
 }
-
-const styles = {
-  container: {
-    padding: "20px",
-    background: "#f6f6f6",
-    minHeight: "100vh",
-  },
-  title: {
-    textAlign: "center",
-    marginBottom: "20px",
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-    gap: "20px",
-  },
-  card: {
-    background: "#fff",
-    padding: "15px",
-    borderRadius: "12px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-  },
-  cardHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    marginBottom: "10px",
-    fontSize: "14px",
-    color: "gray",
-  },
-  idText: {
-    fontWeight: "bold",
-    color: "#000",
-  },
-  statusRow: {
-    marginBottom: "10px",
-  },
-  status: {
-    padding: "5px 10px",
-    background: "#ffedd5",
-    color: "#ff4d2d",
-    borderRadius: "20px",
-    fontSize: "12px",
-  },
-  items: {
-    borderTop: "1px solid #eee",
-    borderBottom: "1px solid #eee",
-    padding: "10px 0",
-    marginBottom: "10px",
-  },
-  itemRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    fontSize: "14px",
-    padding: "3px 0",
-  },
-  total: {
-    display: "flex",
-    justifyContent: "space-between",
-    fontSize: "16px",
-  },
-  emptyBox: {
-    textAlign: "center",
-    padding: "40px",
-    background: "#fff",
-    borderRadius: "12px",
-  },
-  cancelBtn: {
-  marginTop: "10px",
-  width: "100%",
-  padding: "8px",
-  background: "#ff4d2d",
-  color: "#fff",
-  border: "none",
-  borderRadius: "8px",
-  cursor: "pointer",
-  fontWeight: "bold",
-},
-};
-

@@ -15,6 +15,9 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 //
 // ================= SEND OTP =================
 router.post("/send-otp", async (req, res) => {
+  console.log("SEND OTP ROUTE HIT");
+  console.log("BODY:", req.body);
+
   try {
     const { email } = req.body;
 
@@ -36,6 +39,9 @@ router.post("/send-otp", async (req, res) => {
         pass: process.env.EMAIL_PASS,
       },
     });
+
+console.log("EMAIL_USER:", process.env.EMAIL_USER);
+console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "FOUND" : "MISSING");
 
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
@@ -117,7 +123,157 @@ router.post("/verify-otp", async (req, res) => {
   }
 });
 
+// ================= RESEND OTP =================
+router.post("/resend-otp", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Purane OTP delete
+    await Otp.deleteMany({ email });
+
+    // Naya OTP
+    const otp = otpGenerator.generate(6, {
+      upperCaseAlphabets: false,
+      lowerCaseAlphabets: false,
+      specialChars: false,
+    });
+
+    await Otp.create({
+      email,
+      otp,
+    });
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "BiteMeNow OTP",
+      text: `Your new OTP is ${otp}`,
+    });
+
+    res.json({
+      success: true,
+      message: "OTP Resent Successfully",
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
 //
+
+// ================= FORGOT PASSWORD =================
+router.post("/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    await Otp.deleteMany({ email });
+
+    const otp = otpGenerator.generate(6, {
+      upperCaseAlphabets: false,
+      lowerCaseAlphabets: false,
+      specialChars: false,
+    });
+
+    await Otp.create({
+      email,
+      otp,
+    });
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Password Reset OTP",
+      text: `Your password reset OTP is ${otp}`,
+    });
+
+    res.json({
+      success: true,
+      message: "OTP Sent Successfully",
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+// ================= RESET PASSWORD =================
+router.post("/reset-password", async (req, res) => {
+  try {
+    const { email, otp, password } = req.body;
+
+    const otpRecord = await Otp.findOne({
+      email,
+      otp,
+    });
+
+    if (!otpRecord) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid OTP",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(
+      password,
+      10
+    );
+
+    await User.findOneAndUpdate(
+      { email },
+      {
+        password: hashedPassword,
+      }
+    );
+
+    await Otp.deleteMany({ email });
+
+    res.json({
+      success: true,
+      message: "Password Reset Successful",
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 // ================= LOGIN =================
 //
 router.post("/login", async (req, res) => {

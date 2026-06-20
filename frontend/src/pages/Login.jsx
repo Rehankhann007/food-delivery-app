@@ -1,165 +1,164 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
 
 export default function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      alert("Please fill all fields");
-      return;
-    }
-
-    setLoading(true);
-
     try {
       const res = await fetch(
-        "https://food-delivery-app-e4by.onrender.com/api/auth/login",
+        "http://localhost:5000/api/auth/login",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
         }
       );
 
       const data = await res.json();
 
-      console.log("LOGIN RESPONSE:", data);
+      if (data.token) {
+        localStorage.setItem(
+          "token",
+          data.token
+        );
 
-      // ❌ OTP NOT VERIFIED CASE
-      if (data.message === "Please verify your email first") {
-        alert("⚠️ Please verify your email first");
+        localStorage.setItem(
+          "user",
+          JSON.stringify(data.user)
+        );
 
-        navigate("/verify-otp", {
-          state: { email },
-        });
+        alert("Login Successful");
 
-        return;
+        navigate("/");
+        window.location.reload();
+      } else {
+        alert(data.message);
       }
-
-      // ❌ INVALID LOGIN
-      if (!data.token) {
-        alert(data.message || "Login failed");
-        return;
-      }
-
-      // ✅ SUCCESS LOGIN
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      alert("Login Successful 🎉");
-      navigate("/");
-
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
       alert("Server Error");
     }
-
-    setLoading(false);
   };
 
+ 
+
   return (
-    <div style={styles.bg}>
-      <div style={styles.card}>
-        <h2 style={styles.title}>Welcome Back 🍔</h2>
-        <p style={styles.subtitle}>Login to order your favorite food</p>
+    <div className="min-h-screen flex justify-center items-center bg-gray-100">
+      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+        
+        <h2 className="text-3xl font-bold text-center text-orange-500 mb-6">
+          Login
+        </h2>
 
         <input
-          style={styles.input}
-          placeholder="Email"
+          type="email"
+          placeholder="Enter Email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) =>
+            setEmail(e.target.value)
+          }
+          className="w-full border p-3 rounded-lg mb-4"
         />
 
         <input
           type="password"
-          style={styles.input}
-          placeholder="Password"
+          placeholder="Enter Password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) =>
+            setPassword(e.target.value)
+          }
+          className="w-full border p-3 rounded-lg mb-4"
         />
 
         <button
           onClick={handleLogin}
-          style={styles.button}
-          disabled={loading}
+          className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600"
         >
-          {loading ? "Logging in..." : "Login"}
+          Login
         </button>
 
-        <p style={styles.text}>
-          New here?{" "}
+        <p
+  className="text-right text-orange-500 cursor-pointer mb-4"
+  onClick={() =>
+    navigate("/forgot-password")
+  }
+>
+  Forgot Password?
+</p>
+
+        <p className="text-center mt-5 mb-5 text-gray-600">
+          Don't have an account?{" "}
           <span
-            onClick={() => navigate("/signup")}
-            style={styles.link}
+            onClick={() =>
+              navigate("/signup")
+            }
+            className="text-orange-500 font-semibold cursor-pointer"
           >
-            Create account
+            Sign Up
           </span>
         </p>
+
+         <div className="flex justify-center">
+  <GoogleLogin
+    size="large"
+    shape="pill"
+    width="350"
+    onSuccess={async (credentialResponse) => {
+      try {
+        const res = await fetch(
+          "http://localhost:5000/api/auth/google",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              token: credentialResponse.credential,
+            }),
+          }
+        );
+
+        const data = await res.json();
+
+        if (data.token) {
+          localStorage.setItem(
+            "token",
+            data.token
+          );
+
+          localStorage.setItem(
+            "user",
+            JSON.stringify(data.user)
+          );
+
+          alert(
+            "Google Account Created Successfully"
+          );
+
+          navigate("/");
+          window.location.reload();
+        }
+      } catch (err) {
+        console.log(err);
+        alert("Google Signup Failed");
+      }
+    }}
+    onError={() => {
+      alert("Google Signup Failed");
+    }}
+  />
+</div>
       </div>
     </div>
   );
 }
-
-// ================= STYLES =================
-const styles = {
-  bg: {
-    height: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "#0f172a",
-  },
-  card: {
-    width: "360px",
-    padding: "30px",
-    borderRadius: "16px",
-    background: "rgba(255,255,255,0.06)",
-    backdropFilter: "blur(15px)",
-    boxShadow: "0 0 30px rgba(0,0,0,0.4)",
-    color: "#fff",
-    textAlign: "center",
-  },
-  title: {
-    marginBottom: "5px",
-  },
-  subtitle: {
-    fontSize: "13px",
-    opacity: 0.7,
-    marginBottom: "20px",
-  },
-  input: {
-    width: "100%",
-    padding: "12px",
-    margin: "10px 0",
-    borderRadius: "10px",
-    border: "1px solid rgba(255,255,255,0.1)",
-    outline: "none",
-    background: "rgba(255,255,255,0.05)",
-    color: "#fff",
-  },
-  button: {
-    width: "100%",
-    padding: "12px",
-    marginTop: "10px",
-    background: "#ff4d2d",
-    border: "none",
-    borderRadius: "10px",
-    color: "#fff",
-    fontWeight: "bold",
-    cursor: "pointer",
-  },
-  text: {
-    marginTop: "15px",
-    fontSize: "14px",
-  },
-  link: {
-    color: "#ff4d2d",
-    cursor: "pointer",
-    fontWeight: "bold",
-  },
-};
