@@ -1,15 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Checkout() {
+export default function Checkout({ cart, setCart }) {
   const navigate = useNavigate();
   const [address, setAddress] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
-
-  const [cart, setCart] = useState(
-    JSON.parse(localStorage.getItem("cart")) || []
-  );
 
   const token = localStorage.getItem("token");
 

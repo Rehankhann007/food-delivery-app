@@ -19,22 +19,26 @@ function Home({ cart, setCart }) {
   };
 
   const addToCart = (food) => {
-    const existingItem = cart.find(
+  console.log("CLICKED", food.name);
+
+  setCart((prevCart) => {
+    console.log("PREV CART", prevCart);
+
+    const existingItem = prevCart.find(
       (item) => item._id === food._id
     );
 
     if (existingItem) {
-      const updatedCart = cart.map((item) =>
+      return prevCart.map((item) =>
         item._id === food._id
           ? { ...item, qty: (item.qty || 1) + 1 }
           : item
       );
-
-      setCart(updatedCart);
-    } else {
-      setCart([...cart, { ...food, qty: 1 }]);
     }
-  };
+
+    return [...prevCart, { ...food, qty: 1 }];
+  });
+};
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
@@ -83,7 +87,7 @@ function Home({ cart, setCart }) {
 
                 <button
                   onClick={() => addToCart(food)}
-                  className="mt-4 w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 active:scale-95 transition cursor-pointer"
+                  className="mt-4 w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition"
                 >
                   Add To Cart
                 </button>
