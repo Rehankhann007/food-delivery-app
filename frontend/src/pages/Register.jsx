@@ -29,7 +29,7 @@ function Register() {
       const data = await res.json();
 
       if (data.success) {
-        alert("OTP Sent Successfully");
+        
         setOtpSent(true);
       } else {
         alert(data.message);
@@ -61,7 +61,7 @@ const resendOtp = async () => {
     const data = await res.json();
 
     if (data.success) {
-      alert("New OTP Sent");
+      
     } else {
       alert(data.message);
     }
@@ -97,7 +97,7 @@ const resendOtp = async () => {
       const data = await res.json();
 
       if (data.success) {
-        alert("Account Created Successfully");
+        
 
         navigate("/login");
       } else {
@@ -233,9 +233,7 @@ const resendOtp = async () => {
             JSON.stringify(data.user)
           );
 
-          alert(
-            "Google Account Created Successfully"
-          );
+          
 
           navigate("/");
           window.location.reload();
