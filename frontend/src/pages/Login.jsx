@@ -86,7 +86,7 @@ export default function Login() {
 
         <button
           onClick={handleLogin}
-          className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600"
+          className="w-full hover:cursor-pointer bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600"
         >
           Login
         </button>
@@ -100,7 +100,7 @@ export default function Login() {
   Forgot Password?
 </p>
 
-        <p className="text-center mt-5 mb-5 text-gray-600">
+        <p className="text-center hover:cursor-pointer mt-5 mb-5 text-gray-600">
           Don't have an account?{" "}
           <span
             onClick={() =>

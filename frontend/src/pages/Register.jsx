@@ -143,7 +143,7 @@ const resendOtp = async () => {
       {!otpSent ? (
         <button
           onClick={sendOtp}
-          className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600"
+          className="w-full hover:cursor-pointer bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600"
         >
           Send OTP
         </button>
@@ -163,14 +163,14 @@ const resendOtp = async () => {
 
     <button
       onClick={verifyOtp}
-      className="w-full bg-green-500 text-white py-3 rounded-lg mb-3"
+      className="w-full hover:cursor-pointer bg-green-500 text-white py-3 rounded-lg mb-3"
     >
       Verify OTP
     </button>
 
     <button
       onClick={resendOtp}
-      className="w-full bg-blue-500 text-white py-3 rounded-lg"
+      className="w-full hover:cursor-pointer bg-blue-500 text-white py-3 rounded-lg"
     >
       Resend OTP
     </button>
