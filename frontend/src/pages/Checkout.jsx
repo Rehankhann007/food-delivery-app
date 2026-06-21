@@ -70,6 +70,7 @@ if (!token)
 
     if (data.success) {
       alert("Order Placed 🍔");
+      setCart([]);
       localStorage.removeItem("cart");
       navigate("/my-orders");
     }
