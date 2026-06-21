@@ -11,11 +11,7 @@ const Otp = require("../models/Otp");
 const router = express.Router();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-const { Resend } = require("resend");
 
-const resend = new Resend(
-  process.env.RESEND_API_KEY
-);
 //
 // ================= SEND OTP =================
 router.post("/send-otp", async (req, res) => {
@@ -36,12 +32,15 @@ router.post("/send-otp", async (req, res) => {
       otp,
     });
 
-  await resend.emails.send({
-  from: "onboarding@resend.dev",
-  to: email,
-  subject: "Email Verification OTP",
-  html: `<h2>Your OTP is ${otp}</h2>`,
-});
+console.log("Before sendEmail");
+
+  await sendEmail(
+  email,
+  "Email Verification OTP",
+  `<h2>Your OTP is ${otp}</h2>`
+);
+
+console.log("After sendEmail");
 
     res.json({
       success: true,
@@ -138,12 +137,11 @@ router.post("/resend-otp", async (req, res) => {
 
     
 
-    await resend.emails.send({
-  from: "onboarding@resend.dev",
-  to: email,
-  subject: "BiteMeNow OTP",
-  html: `<h2>Your New OTP is ${otp}</h2>`,
-});
+   await sendEmail(
+  email,
+  "BiteMeNow OTP",
+  `<h2>Your New OTP is ${otp}</h2>`
+);
 
     res.json({
       success: true,
@@ -189,12 +187,11 @@ router.post("/forgot-password", async (req, res) => {
 
     
 
-    await resend.emails.send({
-  from: "onboarding@resend.dev",
-  to: email,
-  subject: "Password Reset OTP",
-  html: `<h2>Your Password Reset OTP is ${otp}</h2>`,
-});
+    await sendEmail(
+  email,
+  "Password Reset OTP",
+  `<h2>Your Password Reset OTP is ${otp}</h2>`
+);
 
     res.json({
       success: true,

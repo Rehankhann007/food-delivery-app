@@ -1,30 +1,33 @@
-const nodemailer = require("nodemailer");
+const SibApiV3Sdk = require("sib-api-v3-sdk");
 
-const sendEmail = async (email, otp) => {
+const client = SibApiV3Sdk.ApiClient.instance;
+
+client.authentications["api-key"].apiKey =
+  process.env.BREVO_API_KEY;
+
+const apiInstance =
+  new SibApiV3Sdk.TransactionalEmailsApi();
+
+const sendEmail = async (
+  to,
+  subject,
+  html
+) => {
   try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
+  await apiInstance.sendTransacEmail({
+    sender: {
+      email: "rehankhann77088@gmail.com",
+      name: "BiteMeNow",
+    },
+    to: [{ email: to }],
+    subject,
+    htmlContent: html,
+  });
 
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "OTP Verification - Food Delivery App",
-      html: `
-        <h2>Your OTP Code</h2>
-        <h1>${otp}</h1>
-        <p>This OTP is valid for 10 minutes.</p>
-      `,
-    });
-
-    console.log("Email sent successfully");
-  } catch (error) {
-    console.log("Email Error:", error);
-  }
+  console.log("Email sent successfully");
+} catch (error) {
+  console.log("EMAIL ERROR:", error);
+}
 };
 
 module.exports = sendEmail;
