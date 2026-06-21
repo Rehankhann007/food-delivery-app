@@ -31,7 +31,7 @@ function App() {
     <GoogleOAuthProvider clientId="514243762273-54r7kcibl5mjlg3imrnpqd0b0ch9tr1p.apps.googleusercontent.com">
       <BrowserRouter>
         {/* Navbar always visible */}
-        <Navbar />
+        <Navbar cart={cart} />
 
       <Routes>
 

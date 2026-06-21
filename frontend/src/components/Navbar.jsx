@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaShoppingCart, FaBars, FaTimes } from "react-icons/fa";
 
-function Navbar() {
+function Navbar({ cart }) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -10,8 +10,6 @@ function Navbar() {
 
   const user = JSON.parse(localStorage.getItem("user"));
 
-  const cart =
-    JSON.parse(localStorage.getItem("cart")) || [];
 
   const cartCount = cart.reduce(
     (total, item) => total + (item.qty || 1),
