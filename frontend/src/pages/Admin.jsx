@@ -170,6 +170,20 @@ export default function Admin() {
                 User ID: {order.userId}
               </p>
 
+            <p>
+  <strong>Name:</strong>{" "}
+  {order.customerName}
+</p>
+
+<p>
+  <strong>Mobile:</strong>{" "}
+  {order.mobileNumber}
+</p>
+
+<p>
+  <strong>Address:</strong>{" "}
+  {order.address}
+</p>
               <p>
                 Total: ₹
                 {order.totalAmount}

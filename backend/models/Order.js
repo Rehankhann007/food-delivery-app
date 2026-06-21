@@ -7,6 +7,21 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
 
+    customerName: {
+      type: String,
+      required: true,
+    },
+
+    mobileNumber: {
+      type: String,
+      required: true,
+    },
+
+    address: {
+      type: String,
+      required: true,
+    },
+
     items: {
       type: Array,
       required: true,
@@ -14,11 +29,6 @@ const orderSchema = new mongoose.Schema(
 
     totalAmount: {
       type: Number,
-      required: true,
-    },
-
-    address: {
-      type: String,
       required: true,
     },
 

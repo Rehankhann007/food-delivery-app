@@ -9,14 +9,23 @@ const router = express.Router();
 //
 router.post("/place", auth, async (req, res) => {
   try {
-    const { items, totalAmount, address } = req.body;
+    console.log("ORDER BODY:", req.body);
 
-    const order = new Order({
-      userId: req.user.id,
+    const {
+      customerName,
+      mobileNumber,
       items,
       totalAmount,
       address,
-      status: "Pending",
+    } = req.body;
+
+    const order = new Order({
+      userId: req.user.id,
+      customerName,
+      mobileNumber,
+      items,
+      totalAmount,
+      address,
     });
 
     await order.save();

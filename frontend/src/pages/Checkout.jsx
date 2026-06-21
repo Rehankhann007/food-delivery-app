@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 export default function Checkout() {
   const navigate = useNavigate();
   const [address, setAddress] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
 
   const [cart, setCart] = useState(
     JSON.parse(localStorage.getItem("cart")) || []
@@ -40,8 +42,18 @@ export default function Checkout() {
   );
 
   const placeOrder = async () => {
-    if (!address) return alert("Enter address");
-    if (!token) return alert("Login required");
+    
+    if (!customerName)
+  return alert("Enter Name");
+
+if (!mobileNumber)
+  return alert("Enter Mobile Number");
+
+if (!address)
+  return alert("Enter Address");
+   
+if (!token) 
+  return alert("Login required");
 
     const res = await fetch("https://food-delivery-app-e4by.onrender.com/api/orders/place", {
       method: "POST",
@@ -50,10 +62,12 @@ export default function Checkout() {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        items: cart,
-        totalAmount: Number(total),
-        address,
-      }),
+  customerName,
+  mobileNumber,
+  items: cart,
+  totalAmount: Number(total),
+  address,
+}),
     });
 
     const data = await res.json();
@@ -111,6 +125,34 @@ export default function Checkout() {
             <p>Items: {cart.length}</p>
             <h3>Total: ₹{total}</h3>
           </div>
+
+          <input
+  type="text"
+  placeholder="Enter Full Name"
+  value={customerName}
+  onChange={(e) => setCustomerName(e.target.value)}
+  style={{
+    width: "100%",
+    padding: "10px",
+    marginBottom: "10px",
+    borderRadius: "10px",
+    border: "1px solid #ddd",
+  }}
+/>
+
+<input
+  type="text"
+  placeholder="Enter Mobile Number"
+  value={mobileNumber}
+  onChange={(e) => setMobileNumber(e.target.value)}
+  style={{
+    width: "100%",
+    padding: "10px",
+    marginBottom: "10px",
+    borderRadius: "10px",
+    border: "1px solid #ddd",
+  }}
+/>
 
           <textarea
             placeholder="Enter delivery address..."
