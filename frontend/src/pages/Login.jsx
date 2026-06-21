@@ -57,116 +57,130 @@ export default function Login() {
  
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-100">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
-        
-        <h2 className="text-3xl font-bold text-center text-orange-500 mb-6">
-          Login
+  <div className="mt-10 flex items-center justify-center from-orange-50 to-orange-100 px-4 overflow-hidden">
+    
+    <div className="bg-white w-full max-w-md p-5 md:p-7 rounded-2xl shadow-2xl">
+
+      {/* Logo */}
+      <div className="text-center mb-6">
+        <h1 className="text-5xl mb-2">🍔</h1>
+
+        <h2 className="text-3xl font-bold text-orange-500">
+          Welcome Back
         </h2>
 
-        <input
-          type="email"
-          placeholder="Enter Email"
-          value={email}
-          onChange={(e) =>
-            setEmail(e.target.value)
-          }
-          className="w-full border p-3 rounded-lg mb-4"
-        />
-
-        <input
-          type="password"
-          placeholder="Enter Password"
-          value={password}
-          onChange={(e) =>
-            setPassword(e.target.value)
-          }
-          className="w-full border p-3 rounded-lg mb-4"
-        />
-
-        <button
-          onClick={handleLogin}
-          className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600"
-        >
-          Login
-        </button>
-
-        <p
-  className="text-right text-orange-500 cursor-pointer mb-4"
-  onClick={() =>
-    navigate("/forgot-password")
-  }
->
-  Forgot Password?
-</p>
-
-        <p className="text-center mt-5 mb-5 text-gray-600">
-          Don't have an account?{" "}
-          <span
-            onClick={() =>
-              navigate("/signup")
-            }
-            className="text-orange-500 font-semibold cursor-pointer"
-          >
-            Sign Up
-          </span>
+        <p className="text-gray-500 mt-2 text-sm">
+          Login to continue ordering delicious food
         </p>
-
-         <div className="flex justify-center">
-  <GoogleLogin
-    size="large"
-    shape="pill"
-    width="350"
-    onSuccess={async (credentialResponse) => {
-      try {
-        const res = await fetch(
-          "https://food-delivery-app-e4by.onrender.com/api/auth/google",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              token: credentialResponse.credential,
-            }),
-          }
-        );
-
-        const data = await res.json();
-
-        if (data.token) {
-          localStorage.setItem(
-            "token",
-            data.token
-          );
-
-          localStorage.setItem(
-            "user",
-            JSON.stringify(data.user)
-          );
-
-          alert(
-            "Google Account Created Successfully"
-          );
-
-          navigate("/");
-          window.location.reload();
-        }
-      } catch (err) {
-  console.log("GOOGLE ERROR:", err);
-
-  alert(
-    err?.message ||
-    JSON.stringify(err)
-  );
-}
-    }}
-    onError={() => {
-      alert("Google Signup Failed");
-    }}
-  />
-</div>
       </div>
+
+      {/* Email */}
+      <input
+        type="email"
+        placeholder="Enter Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="w-full border border-gray-300 p-3 rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-orange-400"
+      />
+
+      {/* Password */}
+      <input
+        type="password"
+        placeholder="Enter Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="w-full border border-gray-300 p-3 rounded-xl mb-3 focus:outline-none focus:ring-2 focus:ring-orange-400"
+      />
+
+      {/* Forgot Password */}
+      <div className="flex justify-end mb-4">
+        <button
+          onClick={() => navigate("/forgot-password")}
+          className="text-orange-500 hover:cursor-pointer text-sm hover:underline"
+        >
+          Forgot Password?
+        </button>
+      </div>
+
+      {/* Login Button */}
+      <button
+        onClick={handleLogin}
+        className="w-full bg-orange-500 hover:cursor-pointer text-white py-3 rounded-xl font-semibold hover:bg-orange-600 transition duration-300"
+      >
+        Login
+      </button>
+
+      {/* Divider */}
+      <div className="flex items-center my-6">
+        <div className="flex-1 h-px bg-gray-300"></div>
+
+        <span className="px-3 text-gray-400 text-sm">
+          OR
+        </span>
+
+        <div className="flex-1 h-px bg-gray-300"></div>
+      </div>
+
+      {/* Google Login */}
+      <div className="flex justify-center mb-5 overflow-hidden">
+        <GoogleLogin
+          size="large"
+          shape="pill"
+          width="300"
+          onSuccess={async (credentialResponse) => {
+            try {
+              const res = await fetch(
+                "https://food-delivery-app-e4by.onrender.com/api/auth/google",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type":
+                      "application/json",
+                  },
+                  body: JSON.stringify({
+                    token:
+                      credentialResponse.credential,
+                  }),
+                }
+              );
+
+              const data = await res.json();
+
+              if (data.token) {
+                localStorage.setItem(
+                  "token",
+                  data.token
+                );
+
+                localStorage.setItem(
+                  "user",
+                  JSON.stringify(data.user)
+                );
+
+                navigate("/");
+                window.location.reload();
+              }
+            } catch (err) {
+              alert("Google Login Failed");
+            }
+          }}
+          onError={() => {
+            alert("Google Login Failed");
+          }}
+        />
+      </div>
+
+      {/* Signup */}
+      <p className="text-center text-gray-600 text-sm">
+        Don't have an account?{" "}
+        <span
+          onClick={() => navigate("/signup")}
+          className="text-orange-500 font-semibold cursor-pointer hover:underline"
+        >
+          Sign Up
+        </span>
+      </p>
     </div>
-  );
+  </div>
+);
 }

@@ -11,7 +11,7 @@ import MyOrders from "./pages/MyOrders";
 import Profile from "./pages/Profile";
 import OtpVerify from "./pages/OtpVerify";
 import ForgotPassword from "./pages/ForgotPassword";
-
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import Navbar from "./components/Navbar";
 
@@ -47,20 +47,36 @@ function App() {
 
         {/* 🛒 Cart Checkout */}
         <Route
-          path="/checkout"
-          element={<Checkout cart={cart} setCart={setCart} />}
-        />
+  path="/checkout"
+  element={
+    <ProtectedRoute>
+      <Checkout cart={cart} setCart={setCart} />
+    </ProtectedRoute>
+  }
+/>
 
         {/* 📦 Orders */}
        <Route
   path="/orders"
-  element={<MyOrders />}
+  element={
+    <ProtectedRoute>
+      <MyOrders />
+    </ProtectedRoute>
+  }
 />
 
         {/* 🛠️ Admin Panel */}
         <Route path="/admin" element={<Admin />} />
 
-<Route path="/profile" element={<Profile />} />
+<Route
+  path="/profile"
+  element={
+    <ProtectedRoute>
+      <Profile />
+    </ProtectedRoute>
+  }
+/>
+
 <Route path="/verify-otp" element={<OtpVerify />} />
 
 <Route

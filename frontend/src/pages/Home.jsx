@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 function Home({ cart, setCart }) {
   const [foods, setFoods] = useState([]);
@@ -39,7 +40,7 @@ function Home({ cart, setCart }) {
     <div className="bg-gray-100 min-h-screen flex flex-col">
 
       {/* HERO SECTION */}
-      <div className="bg-orange-500 text-white py-20 text-center">
+      <div id="hero" className="bg-orange-500 text-white py-20 text-center">
         <h1 className="text-5xl font-bold mb-4">
           Order Delicious Food Online 🍔
         </h1>
@@ -49,7 +50,7 @@ function Home({ cart, setCart }) {
       </div>
 
       {/* MAIN CONTENT */}
-      <div className="flex-1 max-w-7xl mx-auto px-6 py-10">
+      <div id="menu" className="flex-1 max-w-7xl mx-auto px-6 py-10">
 
         <h2 className="text-3xl font-bold mb-6">
           Popular Foods 🍕
@@ -107,22 +108,38 @@ function Home({ cart, setCart }) {
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold mb-3">
-              Quick Links
-            </h3>
-            <p className="text-gray-400 hover:text-white cursor-pointer">
-              Home
-            </p>
-            <p className="text-gray-400 hover:text-white cursor-pointer">
-              Menu
-            </p>
-            <p className="text-gray-400 hover:text-white cursor-pointer">
-              Orders
-            </p>
-            <p className="text-gray-400 hover:text-white cursor-pointer">
-              Profile
-            </p>
-          </div>
+  <h3 className="text-lg font-semibold mb-3">
+    Quick Links
+  </h3>
+
+  <a
+    href="#hero"
+    className="block text-gray-400 hover:text-orange-400 mb-2"
+  >
+    Home
+  </a>
+
+  <a
+  href="#menu"
+  className="block text-gray-400 hover:text-orange-400 mb-2"
+>
+  Menu
+</a>
+
+  <Link
+    to="/orders"
+    className="block text-gray-400 hover:text-orange-400 mb-2"
+  >
+    Orders
+  </Link>
+
+  <Link
+    to="/profile"
+    className="block text-gray-400 hover:text-orange-400"
+  >
+    Profile
+  </Link>
+</div>
 
           <div>
             <h3 className="text-lg font-semibold mb-3">
