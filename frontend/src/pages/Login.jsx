@@ -58,7 +58,7 @@ export default function Login() {
 
   return (
     <div className=" flex justify-center items-center">
-      <div className="bg-white mt-40 p-8 rounded-xl shadow-lg w-full max-w-md">
+      <div className="bg-white mt-40 p-8 rounded-xl shadow-2xl w-full max-w-md">
         
         <h2 className="text-3xl font-bold text-center text-orange-500 mb-6">
           Login
