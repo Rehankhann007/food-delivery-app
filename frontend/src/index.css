@@ -11,3 +11,83 @@ body,
 html {
   scroll-behavior: smooth;
 }
+.hero-container {
+  position: relative;
+  height: 90vh;
+  overflow: hidden;
+}
+
+.hero-slide {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  opacity: 0;
+
+  transform: translateY(-100%);
+
+  z-index: 1;
+}
+
+/* ENTER */
+.hero-slide.active {
+  animation: slideEnter 1s ease forwards;
+  z-index: 3;
+}
+
+/* EXIT */
+.hero-slide.exit {
+  animation: slideExit 1s ease forwards;
+  z-index: 2;
+}
+
+@keyframes slideEnter {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideExit {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 4;
+}
+
+.hero-content {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+
+  color: white;
+
+  z-index: 5;
+}

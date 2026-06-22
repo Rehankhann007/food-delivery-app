@@ -12,6 +12,7 @@ import Profile from "./pages/Profile";
 import OtpVerify from "./pages/OtpVerify";
 import ForgotPassword from "./pages/ForgotPassword";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Menu from "./pages/Menu";
 
 import Navbar from "./components/Navbar";
 
@@ -21,6 +22,8 @@ function App() {
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
   });
+
+  
 
   // 💾 Save cart to localStorage
   useEffect(() => {
@@ -61,6 +64,18 @@ function App() {
   element={
     <ProtectedRoute>
       <MyOrders />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/menu"
+  element={
+    <ProtectedRoute>
+      <Menu
+        cart={cart}
+        setCart={setCart}
+      />
     </ProtectedRoute>
   }
 />

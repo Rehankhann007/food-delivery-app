@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaShoppingCart, FaBars, FaTimes } from "react-icons/fa";
+import { FaMoon, FaSun } from "react-icons/fa";
 
-function Navbar({ cart }) {
+function Navbar({ cart, darkMode, setDarkMode }) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  
 
   const token = localStorage.getItem("token");
 
@@ -26,163 +28,222 @@ function Navbar({ cart }) {
   };
 
   return (
-    <nav className="bg-orange-500 text-white shadow-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-        
-        {/* Logo */}
-        <Link
-          to="/"
-          className="text-2xl font-bold"
-        >
-          🍔 BiteMeNow
-        </Link>
+    <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-lg border-b border-gray-200">
+  <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
 
-        {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-5">
-          {token && (
-            <span className="font-semibold">
-              Hi, {user?.name}
-            </span>
-          )}
+    {/* Logo */}
+    <Link
+      to="/"
+      className="text-3xl font-extrabold bg-linear-to-b from-orange-500 to-red-500 bg-clip-text text-transparent"
+    >
+      🍔 BiteMeNow
+    </Link>
 
-          <Link to="/">Home</Link>
+    {/* Desktop Menu */}
+    <div className="hidden md:flex items-center gap-8">
 
-          {!token ? (
-            <>
-              <Link to="/login">Login</Link>
-              <Link to="/signup">Sign Up</Link>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/checkout"
-                className="relative"
-              >
-                <FaShoppingCart size={22} />
+      {token && (
+  <Link
+    to="/"
+    className="font-medium text-gray-700 hover:text-orange-500 transition"
+  >
+    Home
+  </Link>
+)}
+    {token && (
+  <Link
+    to="/menu"
+    className="font-medium text-gray-700 hover:text-orange-500 transition"
+  >
+    Menu
+  </Link>
+)}
 
-                {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-3 bg-red-500 text-xs px-2 py-0.5 rounded-full">
-                    {cartCount}
-                  </span>
-                )}
-              </Link>
-
-              <Link to="/orders">
-                My Orders
-              </Link>
-
-              <Link to="/profile">
-                Profile
-              </Link>
-
-              {isAdmin && (
-                <Link to="/admin">
-                  Admin
-                </Link>
-              )}
-
-              <button
-                onClick={handleLogout}
-                className="bg-white text-orange-500 px-3 py-1 rounded-lg font-medium"
-              >
-                Logout
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* Mobile Menu Button */}
-        <button
-          className="md:hidden text-2xl"
-          onClick={() =>
-            setMenuOpen(!menuOpen)
-          }
-        >
-          {menuOpen ? (
-            <FaTimes />
-          ) : (
-            <FaBars />
-          )}
-        </button>
-      </div>
-
-      {/* Mobile Menu */}
-      {menuOpen && (
-        <div className="md:hidden bg-orange-600 px-4 py-3 flex flex-col gap-4">
-          {token && (
-            <span className="font-semibold">
-              Hi, {user?.name}
-            </span>
-          )}
-
+      {token && (
+        <>
           <Link
-            to="/"
-            onClick={() => setMenuOpen(false)}
+            to="/orders"
+            className="font-medium text-gray-700 hover:text-orange-500 transition"
           >
-            Home
+            Orders
           </Link>
 
-          {!token ? (
-            <>
-              <Link
-                to="/login"
-                onClick={() => setMenuOpen(false)}
-              >
-                Login
-              </Link>
+          <Link
+            to="/profile"
+            className="font-medium text-gray-700 hover:text-orange-500 transition"
+          >
+            Profile
+          </Link>
 
-              <Link
-                to="/signup"
-                onClick={() => setMenuOpen(false)}
-              >
-                Sign Up
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/checkout"
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-2"
-              >
-                <FaShoppingCart />
-                Cart ({cartCount})
-              </Link>
-
-              <Link
-                to="/orders"
-                onClick={() => setMenuOpen(false)}
-              >
-                My Orders
-              </Link>
-
-              <Link
-                to="/profile"
-                onClick={() => setMenuOpen(false)}
-              >
-                Profile
-              </Link>
-
-              {isAdmin && (
-                <Link
-                  to="/admin"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Admin
-                </Link>
-              )}
-
-              <button
-                onClick={handleLogout}
-                className="bg-white text-orange-500 px-3 py-2 rounded-lg"
-              >
-                Logout
-              </button>
-            </>
+          {isAdmin && (
+            <Link
+              to="/admin"
+              className="font-medium text-gray-700 hover:text-orange-500 transition"
+            >
+              Admin
+            </Link>
           )}
-        </div>
+        </>
       )}
-    </nav>
+    </div>
+
+    {/* Right Side */}
+    <div className="hidden md:flex items-center gap-5">
+
+      {token && (
+        <>
+          <span className="text-sm font-medium text-gray-600">
+            Hi, <span className="text-black">{user?.name}</span>
+          </span>
+
+          <Link
+            to="/checkout"
+            className="relative bg-orange-50 p-3 rounded-full hover:bg-orange-100 transition"
+          >
+            <FaShoppingCart
+              size={22}
+              className="text-orange-500"
+            />
+
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                {cartCount}
+              </span>
+            )}
+          </Link>
+
+          <button
+            onClick={handleLogout}
+            className="bg-linear-to-b from-orange-500 to-red-500 px-5 py-2 rounded-xl text-white font-medium hover:scale-105 transition"
+          >
+            Logout
+          </button>
+        </>
+      )}
+
+      {!token && (
+        <>
+          <Link
+            to="/login"
+            className="text-gray-700 hover:text-orange-500"
+          >
+            Login
+          </Link>
+
+          <Link
+            to="/signup"
+            className="bg-linear-to-b from-orange-500 to-red-500 px-5 py-2 rounded-xl text-white"
+          >
+            Sign Up
+          </Link>
+        </>
+      )}
+
+      
+    </div>
+
+    {/* Mobile Button */}
+    <button
+      className="md:hidden text-2xl text-orange-500"
+      onClick={() => setMenuOpen(!menuOpen)}
+    >
+      {menuOpen ? <FaTimes /> : <FaBars />}
+    </button>
+  </div>
+
+  {/* Mobile Menu */}
+  {menuOpen && (
+    <div className="md:hidden bg-white border-t border-gray-200 px-6 py-5 space-y-4 shadow-lg">
+
+      {token && (
+        <p className="font-semibold text-gray-700">
+          Hi, {user?.name}
+        </p>
+      )}
+
+      <Link
+        to="/"
+        onClick={() => setMenuOpen(false)}
+        className="block"
+      >
+        Home
+      </Link>
+
+      {token && (
+  <Link
+    to="/menu"
+    onClick={() => setMenuOpen(false)}
+    className="block"
+  >
+    Menu
+  </Link>
+)}
+
+      {token ? (
+        <>
+          <Link
+            to="/checkout"
+            onClick={() => setMenuOpen(false)}
+            className="block"
+          >
+            Cart ({cartCount})
+          </Link>
+
+          <Link
+            to="/orders"
+            onClick={() => setMenuOpen(false)}
+            className="block"
+          >
+            Orders
+          </Link>
+
+          <Link
+            to="/profile"
+            onClick={() => setMenuOpen(false)}
+            className="block"
+          >
+            Profile
+          </Link>
+
+          {isAdmin && (
+            <Link
+              to="/admin"
+              onClick={() => setMenuOpen(false)}
+              className="block"
+            >
+              Admin
+            </Link>
+          )}
+
+          <button
+            onClick={handleLogout}
+            className="w-full bg-linear-to-b from-orange-500 to-red-500 text-white py-3 rounded-xl"
+          >
+            Logout
+          </button>
+        </>
+      ) : (
+        <>
+          <Link
+            to="/login"
+            onClick={() => setMenuOpen(false)}
+            className="block"
+          >
+            Login
+          </Link>
+
+          <Link
+            to="/signup"
+            onClick={() => setMenuOpen(false)}
+            className="block"
+          >
+            Sign Up
+          </Link>
+        </>
+      )}
+    </div>
+  )}
+</nav>
   );
 }
 
