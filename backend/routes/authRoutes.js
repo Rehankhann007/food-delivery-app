@@ -277,8 +277,11 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid Password" });
     }
 
+    // 🔥 FIX: role ko bhi token payload mein daalna zaroori hai,
+    // warna middleware/auth.js ke req.user.role hamesha undefined aayega
+    // aur admin-only routes ("Admin access required") fail ho jayenge.
     const token = jwt.sign(
-      { id: user._id },
+      { id: user._id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
@@ -328,8 +331,9 @@ router.post("/google", async (req, res) => {
       });
     }
 
+    // 🔥 FIX: same role fix yahan bhi zaroori hai
     const jwtToken = jwt.sign(
-      { id: user._id },
+      { id: user._id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
