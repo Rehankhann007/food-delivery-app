@@ -69,7 +69,7 @@ const Hero = memo(function Hero() {
           Fresh food at your doorstep, in minutes.
         </p>
 
-        <a href="#menu">
+        <a href="menu">
           <button className="btn-glow mt-8 text-white font-semibold px-8 py-3.5 rounded-2xl text-base sm:text-lg fade-up in-view">
             Order Now
           </button>
