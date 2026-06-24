@@ -217,17 +217,7 @@ function Home({ cart, setCart }) {
 
       {/* MAIN CONTENT */}
       <div id="menu" className="flex-1 max-w-7xl mx-auto px-6 py-16 w-full relative z-10">
-        <div className="mb-12 text-center fade-up" ref={observe}>
-          <span className="text-orange-400 text-sm font-semibold uppercase tracking-[0.2em]">
-            Our Menu
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">
-            Popular Foods
-          </h2>
-          <p className="text-white/50 mt-3">
-            Freshly prepared & delivered to your doorstep
-          </p>
-        </div>
+        
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-7">
           {foods.map((food, index) => (
