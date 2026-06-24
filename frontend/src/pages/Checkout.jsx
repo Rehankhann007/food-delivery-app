@@ -9,6 +9,9 @@ export default function Checkout({ cart, setCart }) {
 
   const token = localStorage.getItem("token");
 
+  const inputClass =
+    "w-full bg-white/5 border border-white/10 text-white placeholder-white/30 p-3 rounded-xl mb-3 outline-none focus:border-orange-400/50 focus:shadow-[0_0_0_3px_rgba(255,94,58,0.15)] transition-all";
+
   const updateCart = (newCart) => {
     setCart(newCart);
     localStorage.setItem("cart", JSON.stringify(newCart));
@@ -38,33 +41,28 @@ export default function Checkout({ cart, setCart }) {
   );
 
   const placeOrder = async () => {
-    
-    if (!customerName)
-  return alert("Enter Name");
+    if (!customerName) return alert("Enter Name");
+    if (!mobileNumber) return alert("Enter Mobile Number");
+    if (!address) return alert("Enter Address");
+    if (!token) return alert("Login required");
 
-if (!mobileNumber)
-  return alert("Enter Mobile Number");
-
-if (!address)
-  return alert("Enter Address");
-   
-if (!token) 
-  return alert("Login required");
-
-    const res = await fetch("https://food-delivery-app-e4by.onrender.com/api/orders/place", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-  customerName,
-  mobileNumber,
-  items: cart,
-  totalAmount: Number(total),
-  address,
-}),
-    });
+    const res = await fetch(
+      "https://food-delivery-app-e4by.onrender.com/api/orders/place",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          customerName,
+          mobileNumber,
+          items: cart,
+          totalAmount: Number(total),
+          address,
+        }),
+      }
+    );
 
     const data = await res.json();
 
@@ -77,198 +75,116 @@ if (!token)
   };
 
   return (
-    <div style={styles.page}>
-      <div style={styles.container}>
-
+    <div
+      className="min-h-screen px-4 sm:px-6 py-10"
+      style={{ background: "var(--bg-deep)" }}
+    >
+      <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6">
         {/* LEFT SIDE */}
-        <div style={styles.left}>
-          <h2 style={styles.title}>Your Cart 🛒</h2>
+        <div className="md:col-span-2 glass-card fade-up in-view p-6">
+          <h2 className="text-2xl font-bold text-white mb-5">Your cart 🛒</h2>
 
           {cart.length === 0 ? (
-            <div style={styles.empty}>
-              <h3>No Items Found 😢</h3>
-              <button onClick={() => navigate("/")}>
-                Go Shopping
+            <div className="text-center py-14">
+              <h3 className="text-white/70 text-lg mb-4">
+                No items found 😢
+              </h3>
+              <button
+                onClick={() => navigate("/")}
+                className="btn-glow text-white px-6 py-2.5 rounded-xl font-medium"
+              >
+                Go shopping
               </button>
             </div>
           ) : (
-            cart.map((item, i) => (
-              <div key={i} style={styles.itemCard}>
-                
-                <div>
-                  <h3 style={styles.itemName}>{item.name}</h3>
-                  <p style={styles.price}>₹{item.price}</p>
-                </div>
+            <div className="space-y-3">
+              {cart.map((item, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between gap-3 bg-white/5 border border-white/10 rounded-xl p-4"
+                >
+                  <div className="min-w-0">
+                    <h3 className="text-white font-semibold truncate">
+                      {item.name}
+                    </h3>
+                    <p className="text-white/40 text-sm">₹{item.price}</p>
+                  </div>
 
-                <div style={styles.qtyBox}>
-                  <button onClick={() => decreaseQty(i)}>-</button>
-                  <span>{item.qty || 1}</span>
-                  <button onClick={() => increaseQty(i)}>+</button>
-                </div>
+                  <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-lg px-2 py-1">
+                    <button
+                      onClick={() => decreaseQty(i)}
+                      className="text-white/70 hover:text-orange-400 w-6 h-6"
+                    >
+                      −
+                    </button>
+                    <span className="text-white text-sm w-5 text-center">
+                      {item.qty || 1}
+                    </span>
+                    <button
+                      onClick={() => increaseQty(i)}
+                      className="text-white/70 hover:text-orange-400 w-6 h-6"
+                    >
+                      +
+                    </button>
+                  </div>
 
-                <button style={styles.remove} onClick={() => removeItem(i)}>
-                  ✕
-                </button>
-              </div>
-            ))
+                  <button
+                    onClick={() => removeItem(i)}
+                    className="text-red-400 hover:text-red-300 text-lg px-1"
+                    aria-label="Remove item"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
           )}
         </div>
 
         {/* RIGHT SIDE */}
-        <div style={styles.right}>
-          <h2>Order Summary</h2>
+        <div className="glass-card fade-up in-view p-6 h-fit">
+          <h2 className="text-xl font-bold text-white mb-4">
+            Order summary
+          </h2>
 
-          <div style={styles.summaryBox}>
-            <p>Items: {cart.length}</p>
-            <h3>Total: ₹{total}</h3>
+          <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-5">
+            <p className="text-white/50 text-sm mb-1">Items: {cart.length}</p>
+            <h3 className="text-2xl font-bold text-orange-400">
+              Total: ₹{total}
+            </h3>
           </div>
 
           <input
-  type="text"
-  placeholder="Enter Full Name"
-  value={customerName}
-  onChange={(e) => setCustomerName(e.target.value)}
-  style={{
-    width: "100%",
-    padding: "10px",
-    marginBottom: "10px",
-    borderRadius: "10px",
-    border: "1px solid #ddd",
-  }}
-/>
+            type="text"
+            placeholder="Enter full name"
+            value={customerName}
+            onChange={(e) => setCustomerName(e.target.value)}
+            className={inputClass}
+          />
 
-<input
-  type="text"
-  placeholder="Enter Mobile Number"
-  value={mobileNumber}
-  onChange={(e) => setMobileNumber(e.target.value)}
-  style={{
-    width: "100%",
-    padding: "10px",
-    marginBottom: "10px",
-    borderRadius: "10px",
-    border: "1px solid #ddd",
-  }}
-/>
+          <input
+            type="text"
+            placeholder="Enter mobile number"
+            value={mobileNumber}
+            onChange={(e) => setMobileNumber(e.target.value)}
+            className={inputClass}
+          />
 
           <textarea
             placeholder="Enter delivery address..."
             value={address}
             onChange={(e) => setAddress(e.target.value)}
-            style={styles.input}
+            className={`${inputClass} h-24 resize-none`}
           />
 
-          <button onClick={placeOrder} style={styles.button}>
-            Place Order 🍔
+          <button
+            onClick={placeOrder}
+            className="btn-glow w-full text-white py-3 rounded-xl font-semibold mt-1"
+          >
+            Place order 🍔
           </button>
         </div>
-
       </div>
     </div>
   );
 }
-
-/* 🎨 MODERN UI STYLES */
-const styles = {
-  page: {
-    minHeight: "100vh",
-    background: "#f6f7fb",
-    padding: "30px 10px",
-    fontFamily: "Arial",
-  },
-
-  container: {
-    maxWidth: "1000px",
-    margin: "auto",
-    display: "flex",
-    gap: "20px",
-    flexWrap: "wrap",
-  },
-
-  left: {
-    flex: 2,
-    background: "#fff",
-    padding: "20px",
-    borderRadius: "16px",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
-  },
-
-  right: {
-    flex: 1,
-    background: "#fff",
-    padding: "20px",
-    borderRadius: "16px",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
-    height: "fit-content",
-  },
-
-  title: {
-    marginBottom: "15px",
-  },
-
-  itemCard: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "12px",
-    marginBottom: "10px",
-    borderRadius: "12px",
-    background: "#fafafa",
-    border: "1px solid #eee",
-  },
-
-  itemName: {
-    margin: 0,
-  },
-
-  price: {
-    margin: 0,
-    color: "#555",
-  },
-
-  qtyBox: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-  },
-
-  remove: {
-    background: "transparent",
-    border: "none",
-    color: "red",
-    fontSize: "18px",
-    cursor: "pointer",
-  },
-
-  summaryBox: {
-    margin: "15px 0",
-    padding: "10px",
-    background: "#f9f9f9",
-    borderRadius: "10px",
-  },
-
-  input: {
-    width: "100%",
-    height: "80px",
-    padding: "10px",
-    borderRadius: "10px",
-    border: "1px solid #ddd",
-    marginBottom: "10px",
-  },
-
-  button: {
-    width: "100%",
-    padding: "12px",
-    background: "linear-gradient(135deg, #ff4d2d, #ff7a00)",
-    color: "#fff",
-    border: "none",
-    borderRadius: "12px",
-    fontWeight: "bold",
-    cursor: "pointer",
-  },
-
-  empty: {
-    textAlign: "center",
-    padding: "30px",
-  },
-};

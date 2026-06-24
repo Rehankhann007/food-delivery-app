@@ -14,17 +14,13 @@ export default function MyOrders() {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-  "https://food-delivery-app-e4by.onrender.com/api/orders/my-orders",
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }
-);
+        "https://food-delivery-app-e4by.onrender.com/api/orders/my-orders",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-console.log("MY ORDERS DATA:", res.data);
-
-setOrders(res.data);
+      setOrders(res.data);
     } catch (err) {
       console.log(err);
     } finally {
@@ -39,11 +35,7 @@ setOrders(res.data);
       const res = await axios.put(
         `https://food-delivery-app-e4by.onrender.com/api/orders/cancel/${id}`,
         {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (res.data.success) {
@@ -56,217 +48,100 @@ setOrders(res.data);
     }
   };
 
-  const getStatusStyle = (status) => {
-    switch (status) {
-      case "Pending":
-        return {
-          background: "#FEF3C7",
-          color: "#D97706",
-        };
-
-      case "Preparing":
-        return {
-          background: "#DBEAFE",
-          color: "#2563EB",
-        };
-
-      case "Out For Delivery":
-        return {
-          background: "#FED7AA",
-          color: "#EA580C",
-        };
-
-      case "Delivered":
-        return {
-          background: "#DCFCE7",
-          color: "#16A34A",
-        };
-
-      case "Cancelled":
-        return {
-          background: "#FEE2E2",
-          color: "#DC2626",
-        };
-
-      default:
-        return {
-          background: "#eee",
-          color: "#000",
-        };
-    }
+  const statusStyles = {
+    Pending: "bg-amber-400/15 text-amber-300",
+    Preparing: "bg-blue-400/15 text-blue-300",
+    "Out For Delivery": "bg-orange-400/15 text-orange-300",
+    Delivered: "bg-emerald-400/15 text-emerald-300",
+    Cancelled: "bg-red-400/15 text-red-300",
   };
 
   if (loading) {
     return (
-      <div style={{ textAlign: "center", padding: "50px" }}>
-        <h2>Loading Orders...</h2>
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: "var(--bg-deep)" }}
+      >
+        <h2 className="text-white/60 text-lg">Loading orders...</h2>
       </div>
     );
   }
 
   return (
     <div
-      style={{
-        padding: "20px",
-        minHeight: "100vh",
-        background: "#f5f5f5",
-      }}
+      className="min-h-screen px-4 sm:px-6 py-10"
+      style={{ background: "var(--bg-deep)" }}
     >
-      <h1
-        style={{
-          textAlign: "center",
-          marginBottom: "25px",
-        }}
-      >
+      <h1 className="text-3xl font-extrabold text-center mb-10 bg-gradient-to-r from-orange-400 to-pink-500 bg-clip-text text-transparent">
         📦 My Orders
       </h1>
 
       {orders.length === 0 ? (
-        <div
-          style={{
-            background: "#fff",
-            padding: "40px",
-            borderRadius: "15px",
-            textAlign: "center",
-          }}
-        >
-          <h2>No Orders Yet 😢</h2>
-          <p>Order your favourite food now!</p>
+        <div className="glass-card max-w-md mx-auto p-10 text-center fade-up in-view">
+          <h2 className="text-white text-xl font-semibold mb-2">
+            No orders yet 😢
+          </h2>
+          <p className="text-white/50 text-sm">
+            Order your favourite food now!
+          </p>
         </div>
       ) : (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit,minmax(320px,1fr))",
-            gap: "20px",
-          }}
-        >
+        <div className="max-w-6xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {orders.map((order) => (
             <div
               key={order._id}
-              style={{
-                background: "#fff",
-                borderRadius: "15px",
-                padding: "18px",
-                boxShadow:
-                  "0 4px 12px rgba(0,0,0,0.1)",
-              }}
+              className="glass-card fade-up in-view p-5"
             >
-              {/* Order Header */}
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: "12px",
-                }}
-              >
-                <span>Order ID</span>
-
-                <strong>
+              <div className="flex justify-between mb-3 text-sm">
+                <span className="text-white/40">Order ID</span>
+                <strong className="text-white">
                   #{order._id.slice(-6)}
                 </strong>
               </div>
 
-              {/* Status */}
-              <div style={{ marginBottom: "15px" }}>
+              <div className="mb-4">
                 <span
-                  style={{
-                    padding: "6px 12px",
-                    borderRadius: "30px",
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    ...getStatusStyle(order.status),
-                  }}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    statusStyles[order.status] || "bg-white/10 text-white/70"
+                  }`}
                 >
                   {order.status}
                 </span>
               </div>
 
-              {/* Items */}
-              <div
-                style={{
-                  borderTop: "1px solid #eee",
-                  borderBottom: "1px solid #eee",
-                  padding: "12px 0",
-                }}
-              >
+              <div className="border-t border-b border-white/10 py-3 space-y-1.5">
                 {order.items.map((item, index) => (
                   <div
                     key={index}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      padding: "5px 0",
-                    }}
+                    className="flex justify-between text-sm text-white/70"
                   >
                     <span>
                       {item.name}
-                      {item.qty
-                        ? ` x ${item.qty}`
-                        : ""}
+                      {item.qty ? ` x ${item.qty}` : ""}
                     </span>
-
-                    <span>
-                      ₹
-                      {item.price *
-                        (item.qty || 1)}
-                    </span>
+                    <span>₹{item.price * (item.qty || 1)}</span>
                   </div>
                 ))}
               </div>
 
-              {/* Total */}
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginTop: "12px",
-                  fontSize: "16px",
-                }}
-              >
-                <strong>Total</strong>
-
-                <strong>
+              <div className="flex justify-between mt-4 text-base">
+                <strong className="text-white">Total</strong>
+                <strong className="text-orange-400">
                   ₹{order.totalAmount}
                 </strong>
               </div>
 
-              {/* Date */}
-              <p
-                style={{
-                  marginTop: "10px",
-                  fontSize: "13px",
-                  color: "#666",
-                }}
-              >
-                {new Date(
-                  order.createdAt
-                ).toLocaleString()}
+              <p className="mt-3 text-xs text-white/30">
+                {new Date(order.createdAt).toLocaleString()}
               </p>
 
-              {/* Cancel Button */}
               {order.status !== "Delivered" &&
-                order.status !==
-                  "Cancelled" && (
+                order.status !== "Cancelled" && (
                   <button
-                    onClick={() =>
-                      cancelOrder(order._id)
-                    }
-                    style={{
-                      marginTop: "15px",
-                      width: "100%",
-                      padding: "10px",
-                      border: "none",
-                      borderRadius: "8px",
-                      background:
-                        "#ef4444",
-                      color: "#fff",
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                    }}
+                    onClick={() => cancelOrder(order._id)}
+                    className="mt-4 w-full bg-gradient-to-r from-red-500 to-rose-600 text-white py-2.5 rounded-xl font-semibold hover:scale-[1.02] transition-transform"
                   >
-                    Cancel Order
+                    Cancel order
                   </button>
                 )}
             </div>

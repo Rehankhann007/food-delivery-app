@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+:root {
+  --bg-deep: #07070b;
+  --bg-surface: #12121a;
+  --bg-surface-2: #181822;
+  --bg-card: rgba(255, 255, 255, 0.045);
+  --bg-card-hover: rgba(255, 255, 255, 0.07);
+  --border-glass: rgba(255, 255, 255, 0.09);
+  --border-glass-strong: rgba(255, 255, 255, 0.16);
+  --accent: #ff5e3a;
+  --accent-2: #ff2d75;
+  --accent-3: #7c5cff;
+  --accent-glow: rgba(255, 94, 58, 0.45);
+  --text-primary: #f5f5f7;
+  --text-secondary: #9a9aa8;
+}
+
 html,
 body,
 #root {
@@ -7,87 +23,356 @@ body,
   padding: 0;
   height: 100%;
   overflow-x: hidden;
+  background-color: var(--bg-deep);
 }
+
 html {
   scroll-behavior: smooth;
 }
+
+body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+}
+
+/* ===== Ambient grain texture (adds depth to flat black) ===== */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ===== Ambient glow blobs (subtle animated background depth) ===== */
+.glow-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.glow-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  will-change: transform;
+}
+
+.glow-blob.b1 {
+  width: 480px;
+  height: 480px;
+  top: -120px;
+  left: -100px;
+  background: var(--accent);
+  animation: drift1 18s ease-in-out infinite;
+}
+
+.glow-blob.b2 {
+  width: 420px;
+  height: 420px;
+  bottom: -140px;
+  right: -80px;
+  background: var(--accent-3);
+  animation: drift2 22s ease-in-out infinite;
+}
+
+.glow-blob.b3 {
+  width: 320px;
+  height: 320px;
+  top: 40%;
+  left: 50%;
+  background: var(--accent-2);
+  opacity: 0.18;
+  animation: drift3 26s ease-in-out infinite;
+}
+
+@keyframes drift1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(60px, 40px) scale(1.15); }
+}
+
+@keyframes drift2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-50px, -30px) scale(1.1); }
+}
+
+@keyframes drift3 {
+  0%, 100% { transform: translate(-50%, 0) scale(1); }
+  50% { transform: translate(-50%, -40px) scale(1.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glow-blob { animation: none; }
+}
+
+/* ===== Glass card (now with inset highlight for real depth) ===== */
+.glass-card {
+  position: relative;
+  background: linear-gradient(160deg, var(--bg-card) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 1.5rem;
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.06) inset,
+    0 24px 48px -12px rgba(0, 0, 0, 0.55);
+  will-change: transform;
+}
+
+/* ===== Neon glow button (now with shine sweep) ===== */
+.btn-glow {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 18px var(--accent-glow), 0 0 2px rgba(255, 255, 255, 0.2) inset;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.btn-glow::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: left 0.6s ease;
+}
+
+.btn-glow:hover::before {
+  left: 125%;
+}
+
+.btn-glow:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 0 30px var(--accent-glow), 0 0 2px rgba(255, 255, 255, 0.3) inset;
+}
+
+.btn-glow:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ===== Auth input (richer focus state) ===== */
+.auth-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-glass);
+  color: var(--text-primary);
+  padding: 0.85rem 1rem;
+  border-radius: 0.85rem;
+  outline: none;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.auth-input::placeholder {
+  color: rgba(255, 255, 255, 0.28);
+}
+
+.auth-input:focus {
+  border-color: rgba(255, 94, 58, 0.55);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 4px rgba(255, 94, 58, 0.12);
+}
+
+/* ===== Section fade-in on scroll ===== */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-up.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== HERO (perf-fixed) ===== */
 .hero-container {
   position: relative;
   height: 90vh;
   overflow: hidden;
+  background: var(--bg-deep);
 }
 
 .hero-slide {
   position: absolute;
   inset: 0;
-
   width: 100%;
   height: 100%;
-
   object-fit: cover;
-
   opacity: 0;
-
-  transform: translateY(-100%);
-
-  z-index: 1;
+  /* translate3d forces GPU compositing instead of layout-affecting transforms */
+  transform: translate3d(0, 0, 0) scale(1.04);
+  will-change: opacity, transform;
+  pointer-events: none;
 }
 
-/* ENTER */
 .hero-slide.active {
-  animation: slideEnter 1s ease forwards;
-  z-index: 3;
-}
-
-/* EXIT */
-.hero-slide.exit {
-  animation: slideExit 1s ease forwards;
+  opacity: 1;
+  transition: opacity 1.2s ease;
   z-index: 2;
-}
-
-@keyframes slideEnter {
-  from {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slideExit {
-  from {
-    transform: translateY(0);
-    opacity: 1;
-  }
-
-  to {
-    transform: translateY(100%);
-    opacity: 0;
-  }
 }
 
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,.5);
-  z-index: 4;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 15, 0.55) 0%,
+    rgba(10, 10, 15, 0.75) 60%,
+    rgba(10, 10, 15, 0.95) 100%
+  );
+  z-index: 3;
 }
 
 .hero-content {
   position: absolute;
   inset: 0;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
   text-align: center;
+  color: var(--text-primary);
+  z-index: 4;
+}
 
-  color: white;
+/* ===== Food card glow on hover ===== */
+.food-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+  will-change: transform;
+}
 
-  z-index: 5;
+.food-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255, 94, 58, 0.4);
+  box-shadow: 0 12px 32px rgba(255, 94, 58, 0.18);
+}
+
+/* ===== Scrollbar (optional, fits dark theme) ===== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a35;
+  border-radius: 8px;
+}
+
+/* ===== Float / pulse for badges ===== */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 8px var(--accent-glow);
+  }
+  50% {
+    box-shadow: 0 0 18px var(--accent-glow);
+  }
+}
+
+.badge-pulse {
+  animation: pulseGlow 2.4s ease-in-out infinite;
+}
+
+/* ===== Split-screen auth layout ===== */
+.auth-shell {
+  position: relative;
+  height: calc(100vh - 80px);
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  background: var(--bg-deep);
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .auth-shell {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: calc(100vh - 80px);
+  }
+  .auth-brand {
+    display: none;
+  }
+}
+
+.auth-brand {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem;
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--bg-surface) 0%, var(--bg-deep) 100%);
+  border-right: 1px solid var(--border-glass);
+}
+
+.auth-brand-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.5;
+}
+
+.auth-brand-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    160deg,
+    rgba(7, 7, 11, 0.55) 0%,
+    rgba(7, 7, 11, 0.85) 70%,
+    rgba(7, 7, 11, 0.98) 100%
+  );
+}
+
+.auth-brand-content {
+  position: relative;
+  z-index: 2;
+}
+
+.auth-form-side {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 1;
+  height: 100%;
+  overflow-y: auto;
+}
+
+@media (max-width: 900px) {
+  .auth-form-side {
+    height: auto;
+    padding: 2rem 1.5rem;
+  }
+}
+
+.auth-stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-glass);
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
 }

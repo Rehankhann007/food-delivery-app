@@ -21,12 +21,18 @@ export default function Profile() {
 
   if (!user) {
     return (
-      <div style={styles.container}>
-        <div style={styles.card}>
-          <h2>👤 Profile</h2>
-          <p>No user logged in</p>
-          <button style={styles.button} onClick={() => navigate("/login")}>
-            Go to Login
+      <div
+        className="flex justify-center items-center px-4 overflow-y-auto"
+        style={{ background: "var(--bg-deep)", height: "calc(100vh - 80px)", maxHeight: "calc(100vh - 80px)" }}
+      >
+        <div className="glass-card fade-up in-view w-[350px] p-8 text-center my-auto">
+          <h2 className="text-xl font-bold text-white mb-2">👤 Profile</h2>
+          <p className="text-white/50 mb-5 text-sm">No user logged in</p>
+          <button
+            onClick={() => navigate("/login")}
+            className="btn-glow w-full text-white py-2.5 rounded-xl font-medium"
+          >
+            Go to login
           </button>
         </div>
       </div>
@@ -34,64 +40,39 @@ export default function Profile() {
   }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h2>👤 My Profile</h2>
-
-        <div style={styles.infoBox}>
-          <p><b>Name:</b> {user.name || "N/A"}</p>
-          <p><b>Email:</b> {user.email || "N/A"}</p>
-          <p><b>Role:</b> {user.role || "user"}</p>
+    <div
+      className="flex justify-center items-center px-4 overflow-y-auto"
+      style={{ background: "var(--bg-deep)", height: "calc(100vh - 80px)", maxHeight: "calc(100vh - 80px)" }}
+    >
+      <div className="glass-card fade-up in-view w-[350px] p-8 text-center my-auto">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 flex items-center justify-center text-2xl font-bold text-white">
+          {user.name?.charAt(0)?.toUpperCase() || "U"}
         </div>
 
-        <button style={styles.logoutBtn} onClick={handleLogout}>
+        <h2 className="text-xl font-bold text-white mb-5">My profile</h2>
+
+        <div className="text-left bg-white/5 border border-white/10 rounded-xl p-4 space-y-2.5 mb-6">
+          <p className="text-sm text-white/70">
+            <span className="text-white/40">Name: </span>
+            {user.name || "N/A"}
+          </p>
+          <p className="text-sm text-white/70">
+            <span className="text-white/40">Email: </span>
+            {user.email || "N/A"}
+          </p>
+          <p className="text-sm text-white/70">
+            <span className="text-white/40">Role: </span>
+            {user.role || "user"}
+          </p>
+        </div>
+
+        <button
+          onClick={handleLogout}
+          className="w-full bg-gradient-to-r from-red-500 to-rose-600 text-white py-2.5 rounded-xl font-semibold hover:scale-[1.02] transition-transform"
+        >
           Logout
         </button>
       </div>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    minHeight: "80vh",
-    background: "#f5f5f5",
-  },
-  card: {
-    width: "350px",
-    background: "#fff",
-    padding: "20px",
-    borderRadius: "12px",
-    boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
-    textAlign: "center",
-  },
-  infoBox: {
-    textAlign: "left",
-    marginTop: "15px",
-    marginBottom: "20px",
-    padding: "10px",
-    background: "#f9f9f9",
-    borderRadius: "8px",
-  },
-  logoutBtn: {
-    width: "100%",
-    padding: "10px",
-    background: "red",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-    fontWeight: "bold",
-  },
-  button: {
-    padding: "10px",
-    background: "#28a745",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-  },
-};

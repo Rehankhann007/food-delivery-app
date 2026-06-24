@@ -8,6 +8,9 @@ export default function OtpVerify() {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const inputClass =
+    "w-full bg-white/5 border border-white/10 text-white placeholder-white/30 p-3 rounded-xl mb-3 outline-none focus:border-orange-400/50 focus:shadow-[0_0_0_3px_rgba(255,94,58,0.15)] transition-all";
+
   const verifyOtp = async () => {
     if (!email || !otp) {
       alert("Please enter email and OTP");
@@ -17,13 +20,14 @@ export default function OtpVerify() {
     setLoading(true);
 
     try {
-      const res = await fetch("https://food-delivery-app-e4by.onrender.com/api/auth/verify-otp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, otp }),
-      });
+      const res = await fetch(
+        "https://food-delivery-app-e4by.onrender.com/api/auth/verify-otp",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, otp }),
+        }
+      );
 
       const data = await res.json();
 
@@ -42,22 +46,27 @@ export default function OtpVerify() {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h2 style={styles.title}>🔐 Verify Your Email</h2>
-        <p style={styles.subtitle}>
-          Enter OTP sent to your email
+    <div
+      className="flex justify-center items-center px-4 overflow-y-auto"
+      style={{ background: "var(--bg-deep)", height: "calc(100vh - 80px)", maxHeight: "calc(100vh - 80px)" }}
+    >
+      <div className="glass-card fade-up in-view w-[380px] p-8 text-center my-auto">
+        <h2 className="text-2xl font-bold text-white mb-1">
+          🔐 Verify your email
+        </h2>
+        <p className="text-sm text-white/50 mb-6">
+          Enter the OTP sent to your email
         </p>
 
         <input
-          style={styles.input}
-          placeholder="Enter Email"
+          className={inputClass}
+          placeholder="Enter email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
         <input
-          style={styles.input}
+          className={inputClass}
           placeholder="Enter OTP"
           value={otp}
           onChange={(e) => setOtp(e.target.value)}
@@ -65,14 +74,14 @@ export default function OtpVerify() {
 
         <button
           onClick={verifyOtp}
-          style={styles.button}
           disabled={loading}
+          className="btn-glow w-full text-white py-3 rounded-xl font-semibold mt-2 disabled:opacity-60"
         >
           {loading ? "Verifying..." : "Verify OTP"}
         </button>
 
         <p
-          style={styles.link}
+          className="mt-4 text-orange-400 text-sm cursor-pointer hover:text-orange-300"
           onClick={() => alert("Resend API add karna hoga")}
         >
           Resend OTP
@@ -81,59 +90,3 @@ export default function OtpVerify() {
     </div>
   );
 }
-
-const styles = {
-  container: {
-    height: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "#0f172a",
-  },
-  card: {
-    width: "380px",
-    padding: "30px",
-    borderRadius: "16px",
-    background: "rgba(255,255,255,0.06)",
-    backdropFilter: "blur(15px)",
-    color: "#fff",
-    textAlign: "center",
-    boxShadow: "0 0 25px rgba(0,0,0,0.4)",
-    animation: "float 3s ease-in-out infinite",
-  },
-  title: {
-    marginBottom: "5px",
-  },
-  subtitle: {
-    fontSize: "13px",
-    opacity: 0.7,
-    marginBottom: "20px",
-  },
-  input: {
-    width: "100%",
-    padding: "12px",
-    margin: "10px 0",
-    borderRadius: "10px",
-    border: "1px solid rgba(255,255,255,0.2)",
-    background: "rgba(255,255,255,0.05)",
-    color: "#fff",
-    outline: "none",
-  },
-  button: {
-    width: "100%",
-    padding: "12px",
-    background: "#ff4d2d",
-    color: "#fff",
-    border: "none",
-    borderRadius: "10px",
-    cursor: "pointer",
-    fontWeight: "bold",
-    marginTop: "10px",
-  },
-  link: {
-    marginTop: "15px",
-    color: "#ff4d2d",
-    cursor: "pointer",
-    fontSize: "14px",
-  },
-};

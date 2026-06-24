@@ -1,43 +1,33 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
+    setLoading(true);
     try {
       const res = await fetch(
         "https://food-delivery-app-e4by.onrender.com/api/auth/login",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            password,
-          }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
         }
       );
 
       const data = await res.json();
 
       if (data.token) {
-        localStorage.setItem(
-          "token",
-          data.token
-        );
-
-        localStorage.setItem(
-          "user",
-          JSON.stringify(data.user)
-        );
-
-        alert("Login Successful");
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
 
         navigate("/");
         window.location.reload();
@@ -45,127 +35,165 @@ export default function Login() {
         alert(data.message);
       }
     } catch (error) {
-  console.log("LOGIN ERROR:", error);
-
-  alert(
-    error?.message ||
-    JSON.stringify(error)
-  );
-}
+      console.log("LOGIN ERROR:", error);
+      alert(error?.message || JSON.stringify(error));
+    } finally {
+      setLoading(false);
+    }
   };
 
- 
-
   return (
-    <div className=" flex justify-center items-center">
-      <div className="bg-white mt-40 p-8 rounded-xl shadow-2xl w-full max-w-md">
-        
-        <h2 className="text-3xl font-bold text-center text-orange-500 mb-6">
-          Login
-        </h2>
-
-        <input
-          type="email"
-          placeholder="Enter Email"
-          value={email}
-          onChange={(e) =>
-            setEmail(e.target.value)
-          }
-          className="w-full border p-3 rounded-lg mb-4"
+    <div className="auth-shell">
+      {/* LEFT BRANDING PANEL */}
+      <div className="auth-brand">
+        <img
+          className="auth-brand-image"
+          src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=70&auto=format&fit=crop"
+          alt=""
         />
+        <div className="auth-brand-overlay"></div>
 
-        <input
-          type="password"
-          placeholder="Enter Password"
-          value={password}
-          onChange={(e) =>
-            setPassword(e.target.value)
-          }
-          className="w-full border p-3 rounded-lg mb-4"
-        />
-
-        <button
-          onClick={handleLogin}
-          className="w-full hover:cursor-pointer bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600"
-        >
-          Login
-        </button>
-
-        <p
-  className="text-right text-orange-500 cursor-pointer mb-4"
-  onClick={() =>
-    navigate("/forgot-password")
-  }
->
-  Forgot Password?
-</p>
-
-        <p className="text-center hover:cursor-pointer mt-5 mb-5 text-gray-600">
-          Don't have an account?{" "}
-          <span
-            onClick={() =>
-              navigate("/signup")
-            }
-            className="text-orange-500 font-semibold cursor-pointer"
-          >
-            Sign Up
+        <div className="auth-brand-content">
+          <span className="text-3xl font-extrabold bg-gradient-to-r from-orange-400 to-pink-500 bg-clip-text text-transparent">
+            🍔 BiteMeNow
           </span>
-        </p>
 
-         <div className="flex justify-center">
-  <GoogleLogin
-    size="large"
-    shape="pill"
-    width="350"
-    onSuccess={async (credentialResponse) => {
-      try {
-        const res = await fetch(
-          "https://food-delivery-app-e4by.onrender.com/api/auth/google",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              token: credentialResponse.credential,
-            }),
-          }
-        );
+          <h1 className="text-4xl font-extrabold text-white mt-8 leading-tight max-w-md">
+            Good food,
+            <br />
+            delivered with love.
+          </h1>
 
-        const data = await res.json();
+          <p className="text-white/50 mt-4 max-w-sm">
+            Order from your favourite restaurants and get it delivered to
+            your doorstep in minutes.
+          </p>
 
-        if (data.token) {
-          localStorage.setItem(
-            "token",
-            data.token
-          );
+          <div className="flex gap-3 mt-10 flex-wrap">
+            <span className="auth-stat-pill">⭐ 4.8 average rating</span>
+            <span className="auth-stat-pill">🚚 25 min avg delivery</span>
+          </div>
+        </div>
+      </div>
 
-          localStorage.setItem(
-            "user",
-            JSON.stringify(data.user)
-          );
+      {/* RIGHT FORM SIDE */}
+      <div className="auth-form-side">
+        <div className="glow-bg">
+          <div className="glow-blob b1"></div>
+          <div className="glow-blob b2"></div>
+        </div>
 
-          alert(
-            "Google Account Created Successfully"
-          );
+        <div className="glass-card fade-up in-view w-full max-w-md p-7 relative z-10 my-auto">
+          <h2 className="text-2xl font-extrabold text-white mb-1">
+            Welcome back
+          </h2>
+          <p className="text-white/40 text-sm mb-6">
+            Login to continue ordering
+          </p>
 
-          navigate("/");
-          window.location.reload();
-        }
-      } catch (err) {
-  console.log("GOOGLE ERROR:", err);
+          <label className="text-xs font-medium text-white/40 mb-1.5 block">
+            Email
+          </label>
+          <input
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="auth-input mb-3.5"
+          />
 
-  alert(
-    err?.message ||
-    JSON.stringify(err)
-  );
-}
-    }}
-    onError={() => {
-      alert("Google Signup Failed");
-    }}
-  />
-</div>
+          <label className="text-xs font-medium text-white/40 mb-1.5 block">
+            Password
+          </label>
+          <div className="relative mb-2">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="auth-input pr-11"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-orange-400 transition-colors"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+            </button>
+          </div>
+
+          <p
+            className="text-right text-orange-400 hover:text-orange-300 cursor-pointer mb-4 text-sm"
+            onClick={() => navigate("/forgot-password")}
+          >
+            Forgot password?
+          </p>
+
+          <button
+            onClick={handleLogin}
+            disabled={loading}
+            className="btn-glow w-full text-white py-3 rounded-xl font-semibold disabled:opacity-60"
+          >
+            {loading ? "Logging in..." : "Login"}
+          </button>
+
+          <p className="text-center mt-4 mb-1 text-white/50 text-sm">
+            Don't have an account?{" "}
+            <span
+              onClick={() => navigate("/signup")}
+              className="text-orange-400 font-semibold cursor-pointer hover:text-orange-300"
+            >
+              Sign up
+            </span>
+          </p>
+
+          <div className="my-5 flex items-center gap-3">
+            <div className="flex-1 border-t border-white/10"></div>
+            <span className="text-white/30 text-xs uppercase tracking-wider">
+              or
+            </span>
+            <div className="flex-1 border-t border-white/10"></div>
+          </div>
+
+          <div className="flex justify-center">
+            <GoogleLogin
+              size="large"
+              shape="pill"
+              width="350"
+              onSuccess={async (credentialResponse) => {
+                try {
+                  const res = await fetch(
+                    "https://food-delivery-app-e4by.onrender.com/api/auth/google",
+                    {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        token: credentialResponse.credential,
+                      }),
+                    }
+                  );
+
+                  const data = await res.json();
+
+                  if (data.token) {
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("user", JSON.stringify(data.user));
+
+                    navigate("/");
+                    window.location.reload();
+                  }
+                } catch (err) {
+                  console.log("GOOGLE ERROR:", err);
+                  alert(err?.message || JSON.stringify(err));
+                }
+              }}
+              onError={() => {
+                alert("Google Signup Failed");
+              }}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
