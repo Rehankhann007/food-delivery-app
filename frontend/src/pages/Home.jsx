@@ -252,7 +252,7 @@ function Home({ cart, setCart }) {
             <a href="#hero" className="block text-white/50 hover:text-orange-400 transition mb-2.5 text-sm">
               Home
             </a>
-            <a href="#menu" className="block text-white/50 hover:text-orange-400 transition mb-2.5 text-sm">
+            <a href="menu" className="block text-white/50 hover:text-orange-400 transition mb-2.5 text-sm">
               Menu
             </a>
             <Link to="/orders" className="block text-white/50 hover:text-orange-400 transition mb-2.5 text-sm">
