@@ -70,7 +70,7 @@ export default function Checkout({ cart, setCart }) {
       alert("Order Placed 🍔");
       setCart([]);
       localStorage.removeItem("cart");
-      navigate("/my-orders");
+      navigate("/orders");
     }
   };
 
