@@ -2,26 +2,7 @@ import { useEffect, useState, useRef, useCallback, memo } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-/*
-  PERF FIXES (why the old Home page felt laggy):
-  1. Hero images were full-resolution Unsplash photos (several MB each).
-     -> Now requesting a sized + compressed version via Unsplash's own
-        resize params (?w=1600&q=70&auto=format), so the browser downloads
-        a fraction of the bytes.
-  2. The slider interval re-rendered the WHOLE Home component every 4s
-     (because currentSlide/prevSlide lived in the same component as the
-     food grid). That forced React to re-diff the food cards too.
-     -> Hero slider is split into its own memoized component so its
-        interval only re-renders itself, not the food list below.
-  3. translateY(-100%) / translateY(100%) animations are layout-cheap but
-     still trigger paint on large elements without a GPU layer.
-     -> CSS now uses opacity-only crossfade with `transform: translate3d`
-        + `will-change`, which the browser can composite on the GPU
-        instead of repainting the whole hero on every tick.
-  4. Cards used `whileInView`-less plain divs with no stagger; scroll-in
-     animation is now done with one shared IntersectionObserver instead of
-     one per card (cheaper than per-card observers/listeners).
-*/
+const API_BASE = "https://food-delivery-app-e4by.onrender.com/api";
 
 const HERO_IMAGES = [
   "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&q=70&auto=format&fit=crop",
@@ -69,11 +50,13 @@ const Hero = memo(function Hero() {
           Fresh food at your doorstep, in minutes.
         </p>
 
-        <a href="menu">
+        {/* FIX: Link (React Router) instead of <a href="menu">, which was
+            triggering a full page reload to a broken relative URL. */}
+        <Link to="/menu">
           <button className="btn-glow mt-8 text-white font-semibold px-8 py-3.5 rounded-2xl text-base sm:text-lg fade-up in-view">
             Order Now
           </button>
-        </a>
+        </Link>
       </div>
     </div>
   );
@@ -108,9 +91,11 @@ function FoodCard({ food, index, addToCart, observe }) {
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
+        {/* FIX: show the real category instead of a hardcoded "Popular"
+            label on every single card. */}
         <div className="absolute top-3 left-3">
           <span className="badge-pulse bg-gradient-to-r from-orange-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-            Popular
+            {food.category || "Popular"}
           </span>
         </div>
 
@@ -148,18 +133,30 @@ function FoodCard({ food, index, addToCart, observe }) {
 
 function Home({ cart, setCart }) {
   const [foods, setFoods] = useState([]);
+  const [categories, setCategories] = useState([]);
   const observerRef = useRef(null);
 
   useEffect(() => {
     getFoods();
+    getCategories();
   }, []);
 
   const getFoods = async () => {
     try {
-      const res = await axios.get(
-        "https://food-delivery-app-e4by.onrender.com/api/foods"
-      );
+      const res = await axios.get(`${API_BASE}/foods`);
       setFoods(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // FIX: categories used to be a hardcoded list in the footer; now pulled
+  // live from the same data source Admin uses, so new categories show up
+  // automatically without a code change.
+  const getCategories = async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/foods/categories`);
+      setCategories(res.data);
     } catch (error) {
       console.log(error);
     }
@@ -217,19 +214,46 @@ function Home({ cart, setCart }) {
 
       {/* MAIN CONTENT */}
       <div id="menu" className="flex-1 max-w-7xl mx-auto px-6 py-16 w-full relative z-10">
-        
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-7">
-          {foods.map((food, index) => (
-            <FoodCard
-              key={food._id}
-              food={food}
-              index={index}
-              addToCart={addToCart}
-              observe={observe}
-            />
-          ))}
+        <div className="mb-12 text-center fade-up in-view">
+          <span className="text-orange-400 text-sm font-semibold uppercase tracking-[0.2em]">
+            Our Menu
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">
+            Popular Foods
+          </h2>
+          <p className="text-white/50 mt-3">
+            Freshly prepared & delivered to your doorstep
+          </p>
         </div>
+
+        {foods.length === 0 ? (
+          <p className="text-center text-white/40 py-10">
+            Loading delicious food...
+          </p>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-7">
+            {foods.slice(0, 6).map((food, index) => (
+              <FoodCard
+                key={food._id}
+                food={food}
+                index={index}
+                addToCart={addToCart}
+                observe={observe}
+              />
+            ))}
+          </div>
+        )}
+
+        {foods.length > 6 && (
+          <div className="text-center mt-10">
+            <Link
+              to="/menu"
+              className="inline-block bg-white/5 border border-white/10 text-white/80 hover:text-white hover:border-orange-400/40 px-6 py-3 rounded-xl font-medium transition-all"
+            >
+              View full menu →
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* FOOTER */}
@@ -252,9 +276,10 @@ function Home({ cart, setCart }) {
             <a href="#hero" className="block text-white/50 hover:text-orange-400 transition mb-2.5 text-sm">
               Home
             </a>
-            <a href="menu" className="block text-white/50 hover:text-orange-400 transition mb-2.5 text-sm">
+            {/* FIX: was href="menu" (full reload, broken relative path) */}
+            <Link to="/menu" className="block text-white/50 hover:text-orange-400 transition mb-2.5 text-sm">
               Menu
-            </a>
+            </Link>
             <Link to="/orders" className="block text-white/50 hover:text-orange-400 transition mb-2.5 text-sm">
               Orders
             </Link>
@@ -267,11 +292,21 @@ function Home({ cart, setCart }) {
             <h3 className="text-base font-semibold mb-4 text-white">
               Categories
             </h3>
-            {["Burger", "Pizza", "Pasta", "Drinks"].map((c) => (
-              <p key={c} className="text-white/50 text-sm mb-2.5">
-                {c}
-              </p>
-            ))}
+            {/* FIX: was a hardcoded ["Burger","Pizza","Pasta","Drinks"] list;
+                now reflects whatever categories actually exist in the DB. */}
+            {categories.length === 0 ? (
+              <p className="text-white/30 text-sm">No categories yet</p>
+            ) : (
+              categories.map((c) => (
+                <Link
+                  key={c}
+                  to={`/menu?category=${encodeURIComponent(c)}`}
+                  className="block text-white/50 hover:text-orange-400 transition mb-2.5 text-sm"
+                >
+                  {c}
+                </Link>
+              ))
+            )}
           </div>
 
           <div>
