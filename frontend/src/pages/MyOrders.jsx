@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useToast } from "../components/ToastContext";
 
 export default function MyOrders() {
+  const { showToast } = useToast();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -39,12 +41,14 @@ export default function MyOrders() {
       );
 
       if (res.data.success) {
-        alert("Order Cancelled Successfully");
+        showToast("Order cancelled successfully", "success");
         fetchOrders();
+      } else {
+        showToast(res.data.message || "Failed to cancel order", "error");
       }
     } catch (err) {
       console.log(err);
-      alert("Cancel Failed");
+      showToast("Failed to cancel order", "error");
     }
   };
 

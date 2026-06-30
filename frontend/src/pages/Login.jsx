@@ -2,16 +2,20 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useToast } from "../components/ToastContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleLogin = async () => {
+    setError("");
     setLoading(true);
     try {
       const res = await fetch(
@@ -29,14 +33,15 @@ export default function Login() {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
+        showToast("Login successful 🎉", "success");
         navigate("/");
         window.location.reload();
       } else {
-        alert(data.message);
+        setError(data.message || "Login failed");
       }
     } catch (error) {
       console.log("LOGIN ERROR:", error);
-      alert(error?.message || JSON.stringify(error));
+      setError(error?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -123,6 +128,8 @@ export default function Login() {
             </button>
           </div>
 
+          {error && <p className="field-error">⚠️ {error}</p>}
+
           <p
             className="text-right text-orange-400 hover:text-orange-300 cursor-pointer mb-4 text-sm"
             onClick={() => navigate("/forgot-password")}
@@ -180,16 +187,17 @@ export default function Login() {
                     localStorage.setItem("token", data.token);
                     localStorage.setItem("user", JSON.stringify(data.user));
 
+                    showToast("Login successful 🎉", "success");
                     navigate("/");
                     window.location.reload();
                   }
                 } catch (err) {
                   console.log("GOOGLE ERROR:", err);
-                  alert(err?.message || JSON.stringify(err));
+                  setError(err?.message || "Google login failed");
                 }
               }}
               onError={() => {
-                alert("Google Signup Failed");
+                setError("Google sign-in failed");
               }}
             />
           </div>

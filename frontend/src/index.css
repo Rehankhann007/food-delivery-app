@@ -376,3 +376,30 @@ body::before {
   font-size: 0.8rem;
   color: var(--text-secondary);
 }
+
+/* ===== Toast notifications ===== */
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.toast-enter {
+  animation: toastIn 0.3s ease forwards;
+}
+
+/* ===== Inline form error message ===== */
+.field-error {
+  color: #fca5a5;
+  font-size: 0.8rem;
+  margin-top: -0.5rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

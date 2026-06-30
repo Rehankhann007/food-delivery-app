@@ -15,6 +15,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Menu from "./pages/Menu";
 
 import Navbar from "./components/Navbar";
+import { ToastProvider } from "./components/ToastContext";
 
 function App() {
   // 🛒 Cart state (localStorage support)
@@ -23,8 +24,6 @@ function App() {
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
-  
-
   // 💾 Save cart to localStorage
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
@@ -32,75 +31,66 @@ function App() {
 
   return (
     <GoogleOAuthProvider clientId="514243762273-54r7kcibl5mjlg3imrnpqd0b0ch9tr1p.apps.googleusercontent.com">
-      <BrowserRouter>
-        {/* Navbar always visible */}
-        <Navbar cart={cart} />
+      <ToastProvider>
+        <BrowserRouter>
+          {/* Navbar always visible */}
+          <Navbar cart={cart} />
 
-      <Routes>
+          <Routes>
+            {/* 🏠 Home Page */}
+            <Route path="/" element={<Home cart={cart} setCart={setCart} />} />
 
-        {/* 🏠 Home Page */}
-        <Route
-          path="/"
-          element={<Home cart={cart} setCart={setCart} />}
-        />
+            {/* 🔐 Auth Pages */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Register />} />
 
-        {/* 🔐 Auth Pages */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Register />} />
+            {/* 🛒 Cart Checkout */}
+            <Route
+              path="/checkout"
+              element={
+                <ProtectedRoute>
+                  <Checkout cart={cart} setCart={setCart} />
+                </ProtectedRoute>
+              }
+            />
 
-        {/* 🛒 Cart Checkout */}
-        <Route
-  path="/checkout"
-  element={
-    <ProtectedRoute>
-      <Checkout cart={cart} setCart={setCart} />
-    </ProtectedRoute>
-  }
-/>
+            {/* 📦 Orders */}
+            <Route
+              path="/orders"
+              element={
+                <ProtectedRoute>
+                  <MyOrders />
+                </ProtectedRoute>
+              }
+            />
 
-        {/* 📦 Orders */}
-       <Route
-  path="/orders"
-  element={
-    <ProtectedRoute>
-      <MyOrders />
-    </ProtectedRoute>
-  }
-/>
+            <Route
+              path="/menu"
+              element={
+                <ProtectedRoute>
+                  <Menu cart={cart} setCart={setCart} />
+                </ProtectedRoute>
+              }
+            />
 
-<Route
-  path="/menu"
-  element={
-    <ProtectedRoute>
-      <Menu
-        cart={cart}
-        setCart={setCart}
-      />
-    </ProtectedRoute>
-  }
-/>
+            {/* 🛠️ Admin Panel */}
+            <Route path="/admin" element={<Admin />} />
 
-        {/* 🛠️ Admin Panel */}
-        <Route path="/admin" element={<Admin />} />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
 
-<Route
-  path="/profile"
-  element={
-    <ProtectedRoute>
-      <Profile />
-    </ProtectedRoute>
-  }
-/>
+            <Route path="/verify-otp" element={<OtpVerify />} />
 
-<Route path="/verify-otp" element={<OtpVerify />} />
-
-<Route
-  path="/forgot-password"
-  element={<ForgotPassword />}
-/>
-
-      </Routes>
-    </BrowserRouter>
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+          </Routes>
+        </BrowserRouter>
+      </ToastProvider>
     </GoogleOAuthProvider>
   );
 }

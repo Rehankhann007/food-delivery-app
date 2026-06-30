@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../components/ToastContext";
 
 export default function Checkout({ cart, setCart }) {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [address, setAddress] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
+  const [error, setError] = useState("");
+  const [placing, setPlacing] = useState(false);
 
   const token = localStorage.getItem("token");
 
@@ -41,36 +45,49 @@ export default function Checkout({ cart, setCart }) {
   );
 
   const placeOrder = async () => {
-    if (!customerName) return alert("Enter Name");
-    if (!mobileNumber) return alert("Enter Mobile Number");
-    if (!address) return alert("Enter Address");
-    if (!token) return alert("Login required");
+    setError("");
 
-    const res = await fetch(
-      "https://food-delivery-app-e4by.onrender.com/api/orders/place",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          customerName,
-          mobileNumber,
-          items: cart,
-          totalAmount: Number(total),
-          address,
-        }),
+    if (!customerName) return setError("Please enter your name");
+    if (!mobileNumber) return setError("Please enter your mobile number");
+    if (!address) return setError("Please enter a delivery address");
+    if (!token) return setError("Please login to place an order");
+
+    setPlacing(true);
+
+    try {
+      const res = await fetch(
+        "https://food-delivery-app-e4by.onrender.com/api/orders/place",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            customerName,
+            mobileNumber,
+            items: cart,
+            totalAmount: Number(total),
+            address,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.success) {
+        showToast("Order placed successfully 🍔", "success");
+        setCart([]);
+        localStorage.removeItem("cart");
+        navigate("/orders");
+      } else {
+        setError(data.message || "Failed to place order");
       }
-    );
-
-    const data = await res.json();
-
-    if (data.success) {
-      alert("Order Placed 🍔");
-      setCart([]);
-      localStorage.removeItem("cart");
-      navigate("/orders");
+    } catch (err) {
+      console.log(err);
+      setError("Something went wrong, please try again");
+    } finally {
+      setPlacing(false);
     }
   };
 
@@ -177,11 +194,14 @@ export default function Checkout({ cart, setCart }) {
             className={`${inputClass} h-24 resize-none`}
           />
 
+          {error && <p className="field-error">⚠️ {error}</p>}
+
           <button
             onClick={placeOrder}
-            className="btn-glow w-full text-white py-3 rounded-xl font-semibold mt-1"
+            disabled={placing}
+            className="btn-glow w-full text-white py-3 rounded-xl font-semibold mt-1 disabled:opacity-60"
           >
-            Place order 🍔
+            {placing ? "Placing order..." : "Place order 🍔"}
           </button>
         </div>
       </div>

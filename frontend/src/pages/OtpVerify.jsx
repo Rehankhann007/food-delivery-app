@@ -1,19 +1,24 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../components/ToastContext";
 
 export default function OtpVerify() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const inputClass =
     "w-full bg-white/5 border border-white/10 text-white placeholder-white/30 p-3 rounded-xl mb-3 outline-none focus:border-orange-400/50 focus:shadow-[0_0_0_3px_rgba(255,94,58,0.15)] transition-all";
 
   const verifyOtp = async () => {
+    setError("");
+
     if (!email || !otp) {
-      alert("Please enter email and OTP");
+      setError("Please enter email and OTP");
       return;
     }
 
@@ -32,14 +37,14 @@ export default function OtpVerify() {
       const data = await res.json();
 
       if (res.ok) {
-        alert("OTP Verified Successfully 🎉");
+        showToast("OTP verified successfully 🎉", "success");
         navigate("/login");
       } else {
-        alert(data.message);
+        setError(data.message || "OTP verification failed");
       }
     } catch (err) {
       console.log(err);
-      alert("Server Error");
+      setError("Server error, please try again");
     }
 
     setLoading(false);
@@ -72,6 +77,8 @@ export default function OtpVerify() {
           onChange={(e) => setOtp(e.target.value)}
         />
 
+        {error && <p className="field-error justify-center">⚠️ {error}</p>}
+
         <button
           onClick={verifyOtp}
           disabled={loading}
@@ -82,7 +89,7 @@ export default function OtpVerify() {
 
         <p
           className="mt-4 text-orange-400 text-sm cursor-pointer hover:text-orange-300"
-          onClick={() => alert("Resend API add karna hoga")}
+          onClick={() => showToast("Resend API needs to be added", "info")}
         >
           Resend OTP
         </p>

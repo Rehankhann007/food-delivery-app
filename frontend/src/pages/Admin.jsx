@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import axios from "axios";
+import { useToast } from "../components/ToastContext";
 
 const API_BASE = "https://food-delivery-app-e4by.onrender.com/api";
 
 export default function Admin() {
   const user = JSON.parse(localStorage.getItem("user"));
+  const { showToast } = useToast();
 
   const [orders, setOrders] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState({});
@@ -21,6 +23,7 @@ export default function Admin() {
   const [isNewCategory, setIsNewCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [addingFood, setAddingFood] = useState(false);
+  const [foodError, setFoodError] = useState("");
   const [foods, setFoods] = useState([]);
 
   if (user?.role !== "admin") {
@@ -75,11 +78,11 @@ export default function Admin() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert("Status Updated Successfully");
+      showToast("Order status updated", "success");
       fetchOrders();
     } catch (err) {
       console.log(err);
-      alert("Update Failed");
+      showToast("Failed to update status", "error");
     }
   };
 
@@ -94,13 +97,15 @@ export default function Admin() {
   };
 
   const handleAddFood = async () => {
+    setFoodError("");
     const finalCategory = isNewCategory ? newCategoryName.trim() : foodCategory;
 
-    if (!foodName.trim()) return alert("Enter food name");
-    if (!foodDescription.trim()) return alert("Enter description");
-    if (!foodPrice || Number(foodPrice) <= 0) return alert("Enter valid price");
-    if (!foodImage.trim()) return alert("Enter image URL");
-    if (!finalCategory) return alert("Select or enter a category");
+    if (!foodName.trim()) return setFoodError("Enter food name");
+    if (!foodDescription.trim()) return setFoodError("Enter description");
+    if (!foodPrice || Number(foodPrice) <= 0)
+      return setFoodError("Enter a valid price");
+    if (!foodImage.trim()) return setFoodError("Enter image URL");
+    if (!finalCategory) return setFoodError("Select or enter a category");
 
     setAddingFood(true);
 
@@ -119,13 +124,13 @@ export default function Admin() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert("Food added successfully 🍔");
+      showToast("Food added successfully 🍔", "success");
       resetFoodForm();
       fetchCategories();
       fetchFoods();
     } catch (err) {
       console.log(err);
-      alert(err?.response?.data?.message || "Failed to add food");
+      setFoodError(err?.response?.data?.message || "Failed to add food");
     } finally {
       setAddingFood(false);
     }
@@ -141,11 +146,12 @@ export default function Admin() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      showToast("Food item deleted", "success");
       fetchFoods();
       fetchCategories();
     } catch (err) {
       console.log(err);
-      alert("Failed to delete food");
+      showToast("Failed to delete food", "error");
     }
   };
 
@@ -436,6 +442,8 @@ export default function Admin() {
                 onError={(e) => (e.target.style.display = "none")}
               />
             )}
+
+            {foodError && <p className="field-error">⚠️ {foodError}</p>}
 
             <button
               onClick={handleAddFood}

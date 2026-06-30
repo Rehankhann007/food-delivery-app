@@ -28,7 +28,6 @@ export default function ForgotPassword() {
 
     if (data.success) {
       setOtpSent(true);
-      alert("OTP Sent");
     } else {
       alert(data.message);
     }
@@ -47,7 +46,6 @@ export default function ForgotPassword() {
     const data = await res.json();
 
     if (data.success) {
-      alert("Password Reset Successful");
       navigate("/login");
     } else {
       alert(data.message);

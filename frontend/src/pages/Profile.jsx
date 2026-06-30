@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../components/ToastContext";
 
 export default function Profile() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -15,7 +17,7 @@ export default function Profile() {
     localStorage.removeItem("user");
     localStorage.removeItem("cart");
 
-    alert("Logged out successfully");
+    showToast("Logged out successfully", "success");
     navigate("/login");
   };
 

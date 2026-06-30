@@ -2,9 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useToast } from "../components/ToastContext";
 
 function Register() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -13,8 +15,10 @@ function Register() {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const sendOtp = async () => {
+    setError("");
     setLoading(true);
     try {
       const res = await fetch(
@@ -30,20 +34,21 @@ function Register() {
       const data = JSON.parse(text);
 
       if (data.success) {
-        alert("OTP Sent Successfully");
+        showToast("OTP sent successfully 📩", "success");
         setOtpSent(true);
       } else {
-        alert(data.message);
+        setError(data.message || "Failed to send OTP");
       }
     } catch (err) {
       console.log(err);
-      alert(err.message);
+      setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
   const resendOtp = async () => {
+    setError("");
     try {
       const res = await fetch(
         "https://food-delivery-app-e4by.onrender.com/api/auth/resend-otp",
@@ -57,17 +62,18 @@ function Register() {
       const data = await res.json();
 
       if (data.success) {
-        alert("New OTP Sent");
+        showToast("New OTP sent 📩", "success");
       } else {
-        alert(data.message);
+        setError(data.message || "Failed to resend OTP");
       }
     } catch (err) {
       console.log(err);
-      alert(err?.message || JSON.stringify(err));
+      setError(err?.message || "Something went wrong");
     }
   };
 
   const verifyOtp = async () => {
+    setError("");
     try {
       const res = await fetch(
         "https://food-delivery-app-e4by.onrender.com/api/auth/verify-otp",
@@ -81,14 +87,14 @@ function Register() {
       const data = await res.json();
 
       if (data.success) {
-        alert("Account Created Successfully");
+        showToast("Account created successfully 🎉", "success");
         navigate("/login");
       } else {
-        alert(data.message);
+        setError(data.message || "OTP verification failed");
       }
     } catch (error) {
       console.log(error);
-      alert("Server Error");
+      setError("Server error, please try again");
     }
   };
 
@@ -184,6 +190,8 @@ function Register() {
             </button>
           </div>
 
+          {error && <p className="field-error">⚠️ {error}</p>}
+
           {!otpSent ? (
             <button
               onClick={sendOtp}
@@ -262,17 +270,17 @@ function Register() {
                   if (data.token) {
                     localStorage.setItem("token", data.token);
                     localStorage.setItem("user", JSON.stringify(data.user));
-                    alert("Google Account Created Successfully");
+                    showToast("Google account created 🎉", "success");
                     navigate("/");
                     window.location.reload();
                   }
                 } catch (err) {
                   console.log(err);
-                  alert("Google Signup Failed");
+                  setError("Google signup failed");
                 }
               }}
               onError={() => {
-                alert("Google Signup Failed");
+                setError("Google signup failed");
               }}
             />
           </div>
